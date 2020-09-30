@@ -17,9 +17,6 @@ SELECT * FROM USERS
 `
 
 
-const hostname = '127.0.0.1'; 
-const port = 3000; 
-
 const app = express() // setup express application 
 
 const server = http.createServer(app); 
@@ -45,4 +42,4 @@ app.get('/', (req, res) => {
 })
 
 
-server.listen(port, hostname, () => { console.log(`Server running at http://${hostname}:${port}/`); });
+server.listen(process.env.PORT || 3000, () => { console.log(`Server running at http://${hostname}:${port}/`); });
