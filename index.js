@@ -42,4 +42,4 @@ app.get('/', (req, res) => {
 })
 
 
-server.listen(process.env.PORT || 3000, () => { console.log(`Server running at http://${hostname}:${port}/`); });
+server.listen(process.env.PORT || 3000, () => { console.log(`Server running at Port: ${port}/`); });
