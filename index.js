@@ -32,6 +32,7 @@ app.get('/', (req, res) => {
     db
         .any(query)
         .then(resSql => {
+            console.log(resSql);
             data = resSql["rows"]
             res.json({
                 "users": data
