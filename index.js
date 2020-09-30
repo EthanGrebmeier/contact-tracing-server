@@ -17,6 +17,8 @@ SELECT * FROM USERS
 `
 
 
+const port = process.env.PORT || 3000
+
 const app = express() // setup express application 
 
 const server = http.createServer(app); 
@@ -42,4 +44,4 @@ app.get('/', (req, res) => {
 })
 
 
-server.listen(process.env.PORT || 3000, () => { console.log(`Server running at Port: ${port}/`); });
+server.listen(port, () => { console.log(`Server running at Port: ${port}/`); });
