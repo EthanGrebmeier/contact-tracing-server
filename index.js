@@ -1,18 +1,21 @@
 const http = require('http'); 
 const express = require('express'); 
 const bodyParser = require('body-parser')
-const { Client } = require('pg');
+const pgp = require('pg-promise')({
 
-console.log(process.env.DBHOST)
-
-const client = new Client({
-    connectionString: process.env.DBSTRING,
-    ssl: {
-        rejectUnauthorized: false,
+    connect(client, dc, useCount) {
+        console.log('Connected to Database')
     }
-})
+});
 
-client.connect()
+
+const db = pgp(process.env.DATABASE_URL)
+
+const query =  `
+SELECT * FROM USERS 
+
+`
+
 
 const hostname = '127.0.0.1'; 
 const port = 3000; 
@@ -25,6 +28,21 @@ const server = http.createServer(app);
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: false })); 
 
-app.get('*', (req, res) => res.status(200).send({ message: 'Welcome to the default API route', })); 
+app.get('/', (req, res) => {
+    let data; 
+    db
+        .any(query)
+        .then(resSql => {
+            data = resSql["rows"]
+            res.json({
+                "users": data
+            })
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    
+})
+
 
 server.listen(port, hostname, () => { console.log(`Server running at http://${hostname}:${port}/`); });
