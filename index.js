@@ -3,13 +3,19 @@ const express = require('express');
 const bodyParser = require('body-parser')
 const pgp = require('pg-promise')({
 
+    
+
     connect(client, dc, useCount) {
         console.log('Connected to Database')
-    }
+    },
 });
 
-
-const db = pgp(process.env.DATABASE_URL)
+const db = pgp({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized:false,
+    },
+})
 
 const query =  `
 SELECT * FROM USERS 
@@ -28,14 +34,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false })); 
 
 app.get('/', (req, res) => {
-    let data; 
     db
         .any(query)
         .then(resSql => {
-            console.log(resSql);
-            data = resSql["rows"]
             res.json({
-                "users": data
+                "users": resSql
             })
         })
         .catch(err => {
