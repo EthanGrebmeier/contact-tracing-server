@@ -5,6 +5,7 @@ const db = require('../../pgp');
 //Get all of a users sessions from UserID
 router.get('/', (req, res) => {
     db.task('get-sessions', async t => {
+        console.log(req.body)
         const userSessions = await t.any(`
         Select u.name 
         from people_sessions ps
@@ -22,6 +23,8 @@ router.get('/', (req, res) => {
 
     })
     .then( (obj) => {
+        console.log(userSessions)
+        console.log(locationSessions)
         res.json({
             "Users": obj["userSessions"],
             "Locations" : obj["locationSessions"]

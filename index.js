@@ -19,7 +19,6 @@ app.use('/api/tests', require('./routes/api/tests'))
 
 const server = app.listen(port, () => {
     console.log(`Server running at Port: ${port}/`);
-    console.log('I dont care')
 }); 
 
 
