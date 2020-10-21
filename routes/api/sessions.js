@@ -23,8 +23,7 @@ router.get('/', (req, res) => {
 
     })
     .then( (obj) => {
-        console.log(userSessions)
-        console.log(locationSessions)
+        console.log(obj)
         res.json({
             "Users": obj["userSessions"],
             "Locations" : obj["locationSessions"]
