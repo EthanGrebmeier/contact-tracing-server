@@ -4,7 +4,7 @@ const db = require('../../pgp');
 
 
 //Get all of a User's Connections by ID
-router.get('/connections', (req, res) => {
+router.get('/connections/:userID', (req, res) => {
     db
         .any(`
         Select user2, u.name 
@@ -12,7 +12,7 @@ router.get('/connections', (req, res) => {
         join users u on u.id = f.user2 
         where user1 = $1
 
-        `, [req.body.userID])
+        `, [req.params.userID])
         .then(resSql => {
             res.json({
                 "connections": resSql

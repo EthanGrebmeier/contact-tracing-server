@@ -3,9 +3,9 @@ const router = express.Router();
 const db = require('../../pgp');
 
 //Get all of a users sessions from UserID
-router.get('/', (req, res) => {
+router.get('/:userID', (req, res) => {
     db.task('get-sessions', async t => {
-        console.log(req.body)
+        console.log(req.params)
         const userSessions = await t.any(`
         Select u.name 
         from people_sessions ps
@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
         from locations_sessions ls
         join locations l on l.id = ls.location_id
         where user_id = $1
-        `, [req.body.userID])
+        `, [req.params.userID])
         return {userSessions, locationSessions}
 
     })
