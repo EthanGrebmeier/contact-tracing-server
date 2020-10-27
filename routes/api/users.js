@@ -82,14 +82,68 @@ router.post('/connections', (req, res) => {
         })
 })
 
-router.get('/', (req, res) => {
+router.get('/notifications', (req, res) => {
     let userID = req.body.userID
     db.task('get-notifications', async t => {
-        let friendRequests = await db.any(`
 
-        `)
+        let friendRequests = await db.any(`
+            Select fr.id, u.name, fr.timestamp
+            from friend_requests as fr 
+            join users u on u.id = fr.user1
+            where fr.user2 = $1
+        `, [userID])
+        
+        friendRequests = addNotificationType(friendRequests, `friendRequest`)
+        console.log(friendRequests)
+
+        let sessionRequests = await db.any(`
+            Select psr.id, u.name, psr.timestamp
+            from people_sessions_requests as psr 
+            join users u on u.id = psr.user1
+            where psr.user2 = $1
+        `, [userID])
+
+        sessionRequests = addNotificationType(sessionRequests, `sessionRequest`)
+
+        console.log(sessionRequests)
+
+        let peopleWarnings = await db.any(`
+            Select u.name, psw.type, psw.timestamp
+            from people_sessions_warnings as psw 
+            join people_sessions ps on ps.id = psw.session_id
+            join users u on u.id = ps.user1
+            where ps.user1 = $1
+        `, [userID])
+
+        peopleWarnings = addNotificationType(peopleWarnings, `peopleWarning`)
+        console.log(peopleWarnings)
+
+        let locationWarnings = await db.any(`
+            Select l.name, lsw.timestamp
+            from locations_sessions_warnings as lsw 
+            join locations_sessions ls on ls.id = lsw.session_id
+            join locations l on l.id = ls.location_id
+            join users u on u.id = ls.user_id
+            where ls.user_id = $1
+        `, [userID])
+
+        locationWarnings = addNotificationType(locationWarnings, `locationWarning`)
+        console.log(locationWarnings)
+
+        let notifications = friendRequests.concat(sessionRequests)
+        notifications = notifications.concat(peopleWarnings)
+        notifications = notifications.concat(locationWarnings)
+
+        notifications.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+
+        res.status(200).json({
+            notifications: notifications
+        })
+
     })
 })
+
+
 
 //Update a user's health status
 router.post('/status', (req, res) => {
@@ -185,6 +239,13 @@ let notifyOneVisitor = async (userID) => {
 
 let emailWarning = () => {
     // TODO
+}
+
+let addNotificationType = (notifications, type) => {
+    for (notification in notifications){
+        notifications[notification].type = type 
+    }
+    return notifications
 }
 
 
