@@ -82,7 +82,14 @@ router.post('/connections', (req, res) => {
         })
 })
 
+router.get('/', (req, res) => {
+    let userID = req.body.userID
+    db.task('get-notifications', async t => {
+        let friendRequests = await db.any(`
 
+        `)
+    })
+})
 
 //Update a user's health status
 router.post('/status', (req, res) => {
@@ -95,19 +102,8 @@ router.post('/status', (req, res) => {
             SET status = $1
             WHERE id = $2`, [status, userID])
 
-            // Only runs on positive test 
-            if (status != 'healthy' && status != 'unwell' ){
-
-                //Checks what places the user has visited in the last two weeks 
-                placesVisited = await db.any(`
-                    SELECT location_id, time_start, time_end 
-                    FROM locations_sessions
-                    WHERE user_id = $1
-                `, [userID])
-
-                // Notifies people that were at the same place at the same time in the last two weeks
-                notifyVisitors(placesVisited)
-
+            // Only runs on positive test or feeling unwell
+            if (status == 'positive' || status == 'unwell'){
                 // Checks what people the user has seen in the last two weeks
                 peopleSeen = await db.any(`
                     SELECT ps.id, u.name, date 
@@ -117,7 +113,19 @@ router.post('/status', (req, res) => {
                 `, [userID])
 
                 // Notifies people that are recorded as having direct contact in the last two weeks
-                notifyContacts(peopleSeen)
+                notifyContacts(peopleSeen, status)
+
+                if (status == 'positive'){
+                    //Checks what places the user has visited in the last two weeks 
+                    placesVisited = await db.any(`
+                        SELECT location_id, time_start, time_end 
+                        FROM locations_sessions
+                        WHERE user_id = $1
+                    `, [userID])
+
+                    // Notifies people that were at the same place at the same time in the last two weeks
+                    notifyVisitors(placesVisited)
+                }                
             }
 
             res.status(200)
@@ -134,12 +142,12 @@ router.post('/status', (req, res) => {
 
 
 // Notify people that are recorded as having direct contact in the last two weeks
-let notifyContacts = async (peopleSeen) => {
+let notifyContacts = async (peopleSeen, status) => {
     console.log("PEOPLE")
     console.log(peopleSeen)
     for(people in peopleSeen){
         id = peopleSeen[people].id
-        let notifiedPerson = await db.any(`INSERT INTO people_sessions_warnings (session_id) values ($1) `, [id])
+        let notifiedPerson = await db.any(`INSERT INTO people_sessions_warnings (session_id, type, timestamp) values ($1, $2, clock_timestamp()) `, [id, status])
         emailWarning()
     }
 }
@@ -171,7 +179,7 @@ let notifyVisitors = async (places) => {
 
 //Notifies the creator of the overlapping session
 let notifyOneVisitor = async (userID) => {
-    let notifiedVisitor = await db.any(`INSERT INTO locations_sessions_warnings (session_id) values ($1) `, [userID])
+    let notifiedVisitor = await db.any(`INSERT INTO locations_sessions_warnings (session_id, date) values ($1, clock_timestamp()) `, [userID])
     emailWarning()
 } 
 
