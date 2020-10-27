@@ -15,7 +15,8 @@ router.post('/', (req, res) => {
                 select * from users where id = $1
             `, [req.body.userID])
             console.log(user)
-        }).catch( () => {
+        }).catch( (err) => {
+            console.log(err)
             res.json({
                 "message" : "User not found"
             })

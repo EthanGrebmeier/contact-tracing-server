@@ -84,4 +84,100 @@ router.post('/connections', (req, res) => {
 
 
 
+//Update a user's health status
+router.post('/status', (req, res) => {
+    let status = req.body.status
+    let userID = req.body.userID
+    if(status == 'healthy' || status == 'unwell' || status == 'positive'){
+        db
+        .task('update-status', async t => {
+            user = await db.any(` UPDATE users *
+            SET status = $1
+            WHERE id = $2`, [status, userID])
+
+            // Only runs on positive test 
+            if (status != 'healthy' && status != 'unwell' ){
+
+                //Checks what places the user has visited in the last two weeks 
+                placesVisited = await db.any(`
+                    SELECT location_id, time_start, time_end 
+                    FROM locations_sessions
+                    WHERE user_id = $1
+                `, [userID])
+
+                // Notifies people that were at the same place at the same time in the last two weeks
+                notifyVisitors(placesVisited)
+
+                // Checks what people the user has seen in the last two weeks
+                peopleSeen = await db.any(`
+                    SELECT ps.id, u.name, date 
+                    FROM people_sessions ps
+                    JOIN users u on u.id = ps.user2
+                    WHERE user1 = $1
+                `, [userID])
+
+                // Notifies people that are recorded as having direct contact in the last two weeks
+                notifyContacts(peopleSeen)
+            }
+
+            res.status(200)
+            res.json({status: status})
+
+        })
+    } else {
+        res.status(400).end()
+    }
+    
+})
+
+
+
+
+// Notify people that are recorded as having direct contact in the last two weeks
+let notifyContacts = async (peopleSeen) => {
+    console.log("PEOPLE")
+    console.log(peopleSeen)
+    for(people in peopleSeen){
+        id = peopleSeen[people].id
+        let notifiedPerson = await db.any(`INSERT INTO people_sessions_warnings (session_id) values ($1) `, [id])
+        emailWarning()
+    }
+}
+
+// Notify everyone that had an overlapping session with the sessions of the positive user
+let notifyVisitors = async (places) => {
+    console.log(places)
+    for (place in places){
+        console.log(places[place])
+        let locationID = places[place].location_id 
+        let timeStart = places[place].time_start
+        let timeEnd = places[place].time_end
+        let notifiedVisitors = await db.any(`
+            SELECT user_id 
+            FROM locations_sessions
+            WHERE location_id = $1 
+            AND (
+                time_start between $2 and $3
+                OR time_end between $2 and $3
+            )
+        `, [locationID, timeStart, timeEnd])
+        for (user in notifiedVisitors){
+            console.log(user.user_id)
+            notifyOneVisitor(notifiedVisitors[user])
+        }
+    }
+}
+
+
+//Notifies the creator of the overlapping session
+let notifyOneVisitor = async (userID) => {
+    let notifiedVisitor = await db.any(`INSERT INTO locations_sessions_warnings (session_id) values ($1) `, [userID])
+    emailWarning()
+} 
+
+let emailWarning = () => {
+    // TODO
+}
+
+
 module.exports = router; 
