@@ -82,8 +82,8 @@ router.post('/connections', (req, res) => {
         })
 })
 
-router.get('/notifications', (req, res) => {
-    let userID = req.body.userID
+router.get('/notifications/:userID', (req, res) => {
+    let userID = req.params.userID
     db.task('get-notifications', async t => {
 
         let friendRequests = await db.any(`
