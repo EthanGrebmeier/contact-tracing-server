@@ -243,7 +243,7 @@ let emailWarning = () => {
 
 let addNotificationType = (notifications, type) => {
     for (notification in notifications){
-        notifications[notification].type = type 
+        notifications[notification].notificationType = type 
     }
     return notifications
 }
