@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const app = express() // setup express application 
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 5000
 
 app.use(cors())
 

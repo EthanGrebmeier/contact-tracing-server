@@ -112,7 +112,7 @@ router.get('/notifications/:userID', (req, res) => {
             from people_sessions_warnings as psw 
             join people_sessions ps on ps.id = psw.session_id
             join users u on u.id = ps.user1
-            where ps.user1 = $1
+            where ps.user2 = $1
         `, [userID])
 
         peopleWarnings = addNotificationType(peopleWarnings, `peopleWarning`)
@@ -134,7 +134,7 @@ router.get('/notifications/:userID', (req, res) => {
         notifications = notifications.concat(peopleWarnings)
         notifications = notifications.concat(locationWarnings)
 
-        notifications.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+        notifications.sort((a, b) => new Date(b.timestamp).valueOf() - new Date(a.timestamp).valueOf())
 
         res.status(200).json({
             notifications: notifications
@@ -191,8 +191,6 @@ router.post('/status', (req, res) => {
     }
     
 })
-
-
 
 
 // Notify people that are recorded as having direct contact in the last two weeks
