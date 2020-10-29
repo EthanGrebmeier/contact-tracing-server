@@ -119,7 +119,7 @@ router.get('/notifications/:userID', (req, res) => {
         console.log(peopleWarnings)
 
         let locationWarnings = await db.any(`
-            Select l.name, lsw.timestamp, ls.timestart as date
+            Select l.name, lsw.timestamp, ls.time_start as date
             from locations_sessions_warnings as lsw 
             join locations_sessions ls on ls.id = lsw.session_id
             join locations l on l.id = ls.location_id
