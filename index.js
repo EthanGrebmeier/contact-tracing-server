@@ -14,7 +14,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use('/api/users', require('./routes/api/users'))
 app.use('/api/sessions', require('./routes/api/sessions'))
-app.use('/api/tests', require('./routes/api/tests'))
 
 
 const server = app.listen(port, () => {

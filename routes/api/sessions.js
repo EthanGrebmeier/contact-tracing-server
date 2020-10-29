@@ -11,7 +11,7 @@ router.get('/:userID', (req, res) => {
         from people_sessions ps
         join users u on u.id = ps.user2 
         where user1 = $1
-        `, [req.body.userID])
+        `, [req.params.userID])
 
         const locationSessions = await t.any(`
         Select l.name, ls.date 
