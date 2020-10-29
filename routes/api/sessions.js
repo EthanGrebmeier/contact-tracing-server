@@ -62,15 +62,15 @@ router.post('/locations/', (req, res) => {
 
 // Create a new person session for a user by UserID
 router.post('/people/', (req, res) => {
-    db
-        .any(`  
-        INSERT INTO 
-        people_sessions (user1, user2, date)
-        values ($1, $2, current_date);
-                        
-        INSERT INTO 
-        people_sessions (user1, user2, date)
-        values ($2, $1, current_date);
+    db.task('create-people-session', async t => {
+        db.any(`  
+            INSERT INTO 
+            people_sessions (user1, user2, date)
+            values ($1, $2, current_date);
+                            
+            INSERT INTO 
+            people_sessions_requests (user1, user2, timestamp)
+            values ($1, $2, clock_timestamp());
 
         `, [req.body.userOneID, req.body.userTwoID])
         .then(resSql => {
@@ -81,6 +81,8 @@ router.post('/people/', (req, res) => {
         .catch(err => {
             console.log(err)
         })
+    })
+    
 })
 
 
