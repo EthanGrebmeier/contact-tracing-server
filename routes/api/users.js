@@ -3,6 +3,20 @@ const router = express.Router();
 const db = require('../../pgp');
 
 
+router.get('/:userID', (req, res) => {
+    db.task('get-user', async t => {
+        user = await db.any(`
+            SELECT name, status
+            FROM users
+            where id = $1
+        `, [req.params.userID])
+        
+        res.json({
+            user: user
+        })
+    })
+})
+
 //Get all of a User's Connections by ID
 router.get('/connections/:userID', (req, res) => {
     db
