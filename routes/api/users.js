@@ -21,7 +21,7 @@ router.get('/:userID', (req, res) => {
 router.get('/connections/:userID', (req, res) => {
     db
         .any(`
-        Select user2, u.name 
+        Select user2 as id, u.name 
         from friends f
         join users u on u.id = f.user2 
         where user1 = $1
