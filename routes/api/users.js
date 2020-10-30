@@ -6,7 +6,7 @@ const db = require('../../pgp');
 router.get('/:userID', (req, res) => {
     db.task('get-user', async t => {
         user = await db.one(`
-            SELECT name, status
+            SELECT name, status, id
             FROM users
             where id = $1
         `, [req.params.userID])
