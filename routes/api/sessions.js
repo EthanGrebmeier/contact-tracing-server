@@ -7,10 +7,11 @@ router.get('/:userID', (req, res) => {
     db.task('get-sessions', async t => {
         console.log(req.params)
         const userSessions = await t.any(`
-        Select u.name 
+        Select u.name, date 
         from people_sessions ps
         join users u on u.id = ps.user2 
         where user1 = $1
+        order by date desc
         `, [req.params.userID])
 
         const locationSessions = await t.any(`
