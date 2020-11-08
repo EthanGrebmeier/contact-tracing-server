@@ -37,7 +37,27 @@ router.get('/:userID', (req, res) => {
 
 //Create a new Location session for a user by userID
 router.post('/locations/', (req, res) => {
-    db
+    let timeInSplit = req.body.timeIn.split(":")
+    let timeOutSplit = req.body.timeOut.split(":")
+    let timeIn = new Date(req.body.date)
+    let timeOut = new Date(req.body.date)
+    timeIn.setHours(timeInSplit[0])
+    timeIn.setMinutes(timeInSplit[1])
+    timeOut.setHours(timeOutSplit[0])
+    timeOut.setMinutes(timeOutSplit[1])
+    let timeInString = `${timeIn.getFullYear()}-${timeIn.getMonth() + 1}-${timeIn.getDate} ${timeIn.getHours() + 1}:${timeIn.getMinutes + 1}:00`
+    let timeOutString = `${timeOut.getFullYear()}-${timeOut.getMonth() + 1}-${timeOut.getDate} ${timeOut.getHours() + 1}:${timeOut.getMinutes + 1}:00`
+
+    if (timeIn < timeOut){
+        res.status(400).json({
+            "status": "Improper time format"
+        })
+    } else if( checkTwoWeeks(timeIn) ) {
+        res.status(400).json({
+            "status": "Date must be in the past two weeks"
+        })
+    } else {
+        db
         .any(`
         INSERT INTO
         locations (id, name) 
@@ -46,10 +66,10 @@ router.post('/locations/', (req, res) => {
 
         INSERT INTO 
         locations_sessions (user_id, location_id, date, time_start, time_end)
-        values ($1, $2, current_date, clock_timestamp(), clock_timestamp());
+        values ($1, $2, $3, $4, $5);
                         
 
-        `, [req.body.userID, req.body.locationID, req.body.locationName])
+        `, [req.body.userID, req.body.locationID, req.body.locationName, req.body.date, timeInString, timeOutString])
         .then(resSql => {
             res.json({
                 "status": "Session Created"
@@ -58,6 +78,9 @@ router.post('/locations/', (req, res) => {
         .catch(err => {
             console.log(err)
         })
+    }
+
+    
 })
 
 
@@ -85,6 +108,15 @@ router.post('/people/', (req, res) => {
     })
     
 })
+
+checkTwoWeeks = (date) => {
+
+    let today = new Date()
+    if ((today - date < today - 1209600)){
+        return false
+    } 
+    return true
+}
 
 
 module.exports = router;
