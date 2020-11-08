@@ -45,16 +45,22 @@ router.post('/locations/', (req, res) => {
     timeIn.setMinutes(timeInSplit[1])
     timeOut.setHours(timeOutSplit[0])
     timeOut.setMinutes(timeOutSplit[1])
-    let timeInString = `${timeIn.getFullYear()}-${timeIn.getMonth() + 1}-${timeIn.getDate} ${timeIn.getHours() + 1}:${timeIn.getMinutes + 1}:00`
-    let timeOutString = `${timeOut.getFullYear()}-${timeOut.getMonth() + 1}-${timeOut.getDate} ${timeOut.getHours() + 1}:${timeOut.getMinutes + 1}:00`
+    let timeInString = `${timeIn.getFullYear()}-${timeIn.getMonth() + 1}-${timeIn.getDate()} ${timeIn.getHours()}:${timeIn.getMinutes() + 1}:00`
+    let timeOutString = `${timeOut.getFullYear()}-${timeOut.getMonth() + 1}-${timeOut.getDate()} ${timeOut.getHours()}:${timeOut.getMinutes() + 1}:00`
 
-    if (timeIn < timeOut){
+    console.log("Got Location request")
+
+    if (timeIn > timeOut){
         res.status(400).json({
             "status": "Improper time format"
         })
     } else if( checkTwoWeeks(timeIn) ) {
         res.status(400).json({
             "status": "Date must be in the past two weeks"
+        })
+    } else if( new Date() < timeIn ) {
+        res.status(400).json({
+            "status": "Date must be not be in the future"
         })
     } else {
         db
@@ -66,7 +72,7 @@ router.post('/locations/', (req, res) => {
 
         INSERT INTO 
         locations_sessions (user_id, location_id, date, time_start, time_end)
-        values ($1, $2, $3, $4, $5);
+        values ($1, $2, $4, $5, $6);
                         
 
         `, [req.body.userID, req.body.locationID, req.body.locationName, req.body.date, timeInString, timeOutString])
@@ -112,7 +118,7 @@ router.post('/people/', (req, res) => {
 checkTwoWeeks = (date) => {
 
     let today = new Date()
-    if ((today - date < today - 1209600)){
+    if ((today - 1209600000 < date)){
         return false
     } 
     return true
