@@ -19,6 +19,7 @@ router.get('/:userID', (req, res) => {
         from locations_sessions ls
         join locations l on l.id = ls.location_id
         where user_id = $1
+        order by ls.date desc
         `, [req.params.userID])
         return {userSessions, locationSessions}
 
