@@ -36,6 +36,55 @@ router.get('/:userID', (req, res) => {
     })
 })
 
+//Get all of a users people sessions from UserID
+router.get('/people/:userID', (req, res) => {
+    db.task('get-people-sessions', async t => {
+        console.log(req.params)
+        const userSessions = await t.any(`
+        Select u.name, date 
+        from people_sessions ps
+        join users u on u.id = ps.user2 
+        where user1 = $1
+        order by date desc
+        `, [req.params.userID])
+    })
+    .then( (obj) => {
+        console.log(obj)
+        res.json({
+            "Users": obj["userSessions"],
+        })
+    })
+    .catch(err => {
+        console.log(err)
+    })
+})
+
+// get all of a user's location sessions by ID
+router.get('/locations/:userID', (req, res) => {
+    db.task('get-location-sessions', async t => {
+        console.log(req.params)
+
+        const locationSessions = await t.any(`
+        Select l.name, ls.date 
+        from locations_sessions ls
+        join locations l on l.id = ls.location_id
+        where user_id = $1
+        order by ls.date desc
+        `, [req.params.userID])
+        return {locationSessions}
+
+    })
+    .then( (obj) => {
+        console.log(obj)
+        res.json({
+            "Locations" : obj["locationSessions"]
+        })
+    })
+    .catch(err => {
+        console.log(err)
+    })
+})
+
 //Create a new Location session for a user by userID
 router.post('/locations/', (req, res) => {
     let timeInSplit = req.body.timeIn.split(":")
