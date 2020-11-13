@@ -98,7 +98,7 @@ router.post('/connections', (req, res) => {
 
 //REMOVE FRIEND BY ID
 
-router.delete('/connections/', (req, res) => {
+router.post('/connections/remove', (req, res) => {
     db.task('remove-friend', async t => {
         let removed = await db.any(`
             DELETE FROM friends 
