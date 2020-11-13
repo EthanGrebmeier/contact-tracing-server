@@ -114,7 +114,7 @@ router.post('/connections/decline', (req, res) => {
         request = db.any(`
             DELETE FROM friend_requests 
             WHERE user2 = $1 and user1 = $2
-        `, [req.body.userID, req.body.user2)
+        `, [req.body.userID, req.body.user2])
     })
 })
 
