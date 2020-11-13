@@ -38,7 +38,7 @@ router.get('/connections/:userID', (req, res) => {
 })
 
 
-//Create a new connection
+//Create a new connection request
 router.post('/connections', (req, res) => {
     db
         .task('send-request', async t => {
@@ -96,7 +96,19 @@ router.post('/connections', (req, res) => {
         })
 })
 
-//REMOVE FRIEND BY ID
+//DECLINE FRIEND REQUEST BY USER ID
+
+router.post('/connections/decline', (req, res) => {
+    db.task('decline-friend-request', async t => {
+        request = db.any(`
+            DELETE FROM friend_requests 
+            WHERE user2 = $1 and user1 = $2
+        `, [req.body.userID, req.body.user2)
+    })
+})
+
+
+//REMOVE FRIEND BY USER ID
 
 router.post('/connections/remove', (req, res) => {
     db.task('remove-friend', async t => {
