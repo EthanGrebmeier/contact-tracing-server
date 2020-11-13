@@ -96,6 +96,18 @@ router.post('/connections', (req, res) => {
         })
 })
 
+//REMOVE FRIEND BY ID
+
+router.delete('/connections/', (req, res) => {
+    db.task('remove-friend', async t => {
+        let removed = await db.any(`
+            DELETE FROM friends 
+            where (user1 = $1 and user2 = $2) or (user1 = $2 and user2 = $1)
+        `, [req.body.userID, req.body.user2])
+        res.status(200).send()
+    })
+})
+
 router.get('/notifications/:userID', (req, res) => {
     let userID = req.params.userID
     db.task('get-notifications', async t => {
