@@ -96,6 +96,17 @@ router.post('/connections', (req, res) => {
         })
 })
 
+//DECLINE SESSION REQUEST BY SESSION
+
+router.post('/sessions/decline', (req, res) => {
+    db.task('decline-session-request', async t => {
+        request = db.any(`
+            DELETE FROM people_sessions_requests 
+            WHERE id = $1
+        `, [req.body.sessionID])
+    })
+})
+
 //DECLINE FRIEND REQUEST BY USER ID
 
 router.post('/connections/decline', (req, res) => {
@@ -125,7 +136,7 @@ router.get('/notifications/:userID', (req, res) => {
     db.task('get-notifications', async t => {
 
         let friendRequests = await db.any(`
-            Select fr.id, u.name, fr.timestamp
+            Select fr.id, u.name, fr.user1, fr.user2, fr.timestamp
             from friend_requests as fr 
             join users u on u.id = fr.user1
             where fr.user2 = $1
