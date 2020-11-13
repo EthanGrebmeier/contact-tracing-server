@@ -167,7 +167,7 @@ router.post('/people/', (req, res) => {
 
 
 // Accept a session request by Session ID
-router.post('/people/', (req, res) => {
+router.post('/people/accept', (req, res) => {
     db.task('accept-people-session', async t => {
         db.any(`  
             INSERT INTO 
