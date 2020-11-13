@@ -183,8 +183,26 @@ router.post('/people/accept', (req, res) => {
             console.log(err)
         })
     })
-    
 })
+
+// Accept a session request by Session ID
+router.post('/people/decline', (req, res) => {
+    db.task('decline-people-session', async t => {
+        db.any(`  
+            DELETE FROM people_sessions_requests 
+            WHERE ID = $1
+        `, [req.body.sessionID])
+        .then(resSql => {
+            res.json({
+                "status": "Session Declined"
+            })
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    })
+})
+
 
 checkTwoWeeks = (date) => {
 
