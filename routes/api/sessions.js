@@ -165,6 +165,27 @@ router.post('/people/', (req, res) => {
     
 })
 
+
+// Accept a session request by Session ID
+router.post('/people/', (req, res) => {
+    db.task('accept-people-session', async t => {
+        db.any(`  
+            INSERT INTO 
+            people_sessions (user1, user2, date)
+            values ($1, $2, current_date);
+        `, [req.body.userOneID, req.body.userTwoID])
+        .then(resSql => {
+            res.json({
+                "status": "Session Accepted"
+            })
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    })
+    
+})
+
 checkTwoWeeks = (date) => {
 
     let today = new Date()
