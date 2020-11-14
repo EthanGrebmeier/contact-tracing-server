@@ -166,14 +166,17 @@ router.post('/people/', (req, res) => {
 })
 
 
-// Accept a session request by Session ID
+// Accept a session request by User IDs
 router.post('/people/accept', (req, res) => {
     db.task('accept-people-session', async t => {
         db.any(`  
             INSERT INTO 
             people_sessions (user1, user2, date)
             values ($1, $2, current_date);
-        `, [req.body.userOneID, req.body.userTwoID])
+
+            DELETE FROM people_sessions_requests 
+            WHERE id = $3
+        `, [req.body.userOneID, req.body.userTwoID, req.body.sessionID])
         .then(resSql => {
             res.json({
                 "status": "Session Accepted"
@@ -185,7 +188,7 @@ router.post('/people/accept', (req, res) => {
     })
 })
 
-// Accept a session request by Session ID
+// Decline a session request by Session ID
 router.post('/people/decline', (req, res) => {
     db.task('decline-people-session', async t => {
         db.any(`  
