@@ -114,7 +114,7 @@ router.post('/connections/decline', (req, res) => {
         request = db.any(`
             DELETE FROM friend_requests 
             WHERE user2 = $1 and user1 = $2
-        `, [req.body.userID, req.body.user2])
+        `, [req.body.userOneID, req.body.userTwoID])
     })
 })
 
@@ -126,7 +126,7 @@ router.post('/connections/remove', (req, res) => {
         let removed = await db.any(`
             DELETE FROM friends 
             where (user1 = $1 and user2 = $2) or (user1 = $2 and user2 = $1)
-        `, [req.body.userID, req.body.user2])
+        `, [req.body.userOneID, req.body.userTwoID])
         res.status(200).send()
     })
 })
