@@ -42,15 +42,15 @@ router.get('/connections/:userID', (req, res) => {
 router.post('/connections', (req, res) => {
     db
         .task('send-request', async t => {
-            friend = await db.any(`
+            let friend = await db.any(`
             SELECT * FROM friends WHERE user1 = $2 and user2 = $1
             `, [req.body.userOneID, req.body.userTwoID]) 
-
+            console.log(friend)
             if (friend == []){
-                request = await db.any(`
+                let request = await db.any(`
                 SELECT * FROM friend_requests WHERE user1 = $2 and user2 = $1
                 `, [req.body.userOneID, req.body.userTwoID])
-
+                console.log(request)
                 if(request == []){
                     await db.any(`
                     INSERT INTO friend_requests (user1, user2) VALUES ($1, $2)
