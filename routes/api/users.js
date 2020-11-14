@@ -131,6 +131,8 @@ router.post('/connections/remove', (req, res) => {
     })
 })
 
+
+// GET ALL NOTIFICATIONS BY USER ID
 router.get('/notifications/:userID', (req, res) => {
     let userID = req.params.userID
     db.task('get-notifications', async t => {
@@ -146,7 +148,7 @@ router.get('/notifications/:userID', (req, res) => {
         console.log(friendRequests)
 
         let sessionRequests = await db.any(`
-            Select psr.id, u.name, psr.timestamp
+            Select psr.id, u.name, psr.user1, psr.user2, psr.timestamp
             from people_sessions_requests as psr 
             join users u on u.id = psr.user1
             where psr.user2 = $1
