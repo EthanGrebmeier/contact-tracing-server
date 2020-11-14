@@ -45,13 +45,15 @@ router.post('/connections', (req, res) => {
             let friend = await db.any(`
             SELECT * FROM friends WHERE user1 = $2 and user2 = $1
             `, [req.body.userOneID, req.body.userTwoID]) 
+            console.log("FRIEND")
             console.log(friend)
-            if (friend == []){
+            if (friend.length == 0){
                 let request = await db.any(`
                 SELECT * FROM friend_requests WHERE user1 = $2 and user2 = $1
                 `, [req.body.userOneID, req.body.userTwoID])
+                console.log("REQUEST")
                 console.log(request)
-                if(request == []){
+                if(request.length == 0){
                     await db.any(`
                     INSERT INTO friend_requests (user1, user2) VALUES ($1, $2)
                     `, [req.body.userOneID, req.body.userTwoID])
