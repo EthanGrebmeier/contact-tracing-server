@@ -96,25 +96,16 @@ router.post('/connections', (req, res) => {
         })
 })
 
-//DECLINE SESSION REQUEST BY SESSION
-
-router.post('/sessions/decline', (req, res) => {
-    db.task('decline-session-request', async t => {
-        request = db.any(`
-            DELETE FROM people_sessions_requests 
-            WHERE id = $1
-        `, [req.body.sessionID])
-    })
-})
 
 //DECLINE FRIEND REQUEST BY USER ID
 
 router.post('/connections/decline', (req, res) => {
     db.task('decline-friend-request', async t => {
-        request = db.any(`
+        let request = await db.any(`
             DELETE FROM friend_requests 
             WHERE user2 = $1 and user1 = $2
         `, [req.body.userOneID, req.body.userTwoID])
+        res.status(200).send()
     })
 })
 
