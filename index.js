@@ -1,11 +1,13 @@
 const http = require('http'); 
 const express = require('express'); 
-const passport = require('passport')
-const passportLocal = require('passport-local').Strategy
+
+
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express(); 
+
+const db = require('./pgp');
 
 const port = process.env.PORT || 5000
 
@@ -17,6 +19,8 @@ app.use(cors({
     origin: "http://localhost:3000",
     credentials: true
 }))
+
+
 
 app.use('/api/authenticate', require('./routes/api/authenticate'))
 

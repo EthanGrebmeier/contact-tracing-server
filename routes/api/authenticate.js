@@ -1,9 +1,59 @@
 const express = require('express')
 const router = express.Router()
 
+const passport = require('passport')
+const LocalStrategy = require('passport-local').Strategy
+
 const bcrypt = require('bcryptjs')
 
 const db = require('../../pgp');
+
+
+passport.use(new LocalStrategy((username, password, cb) => {
+  let email = username.toLowerCase()
+  console.log(email)
+  db.task('log-in', async t => {
+
+      let user = await db.any(`
+      SELECT * from users where email = $1
+      `, [email])
+
+      if (user.length == 0){
+          cb(null, false)
+      } else {
+          console.log(user)
+          bcrypt.compare(password, user[0]["password"], function(err, status){
+              if (status) {
+                console.log(user)
+                cb(null, {id: user[0]["id"], username: user[0]["email"]})
+              } else {
+              cb(null, false)
+              }
+          })
+      }
+  })
+}))
+
+passport.serializeUser((user, done) => {
+  console.log(user)
+  done(null, user.id)
+})
+
+passport.deserializeUser((id, cb) => {
+  db.task('deserialize', async t => {
+
+      let user = await db.any(`
+      SELECT id, email from users where id = $1
+      `, [id])
+
+      cb(null, user[0])
+      
+  })
+})
+
+router.use(passport.initialize())
+
+router.use(passport.session())
 
 router.post('/register', (req, res) => {
   db.task('register-user', async t => {
@@ -74,36 +124,12 @@ router.post('/register', (req, res) => {
 })
 
 
-router.post('/login', (req, res) => {
-  console.log(req.body)
-  let password = req.body.password
-  let email = req.body.email
-  if (password && email){
-    email = email.toLowerCase()
-    db.task('log-in', async t => {
-      let user = await db.any(`
-        SELECT * from users where email = $1
-      `, [email])
-      if (user.length == 0){
-        res.send("Email Not Found")
-      } else {
-        console.log(user)
-        bcrypt.compare(password, user[0]["password"], function(err, status){
-          if (status) {
-            res.json({
-              userID: user[0]["id"]
-            })
-          } else {
-            res.send("Invalid Password")
-          }
-        })
-        
-      }
-    })
-  } else {
-    res.status(200).send("Invalid Request")
-  }
-  
+router.post('/login', passport.authenticate('local'), (req, res) => {
+  console.log(req)
+  let {user} = req
+  res.json({
+    userID: user["id"]
+  })
 })
 
 var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
