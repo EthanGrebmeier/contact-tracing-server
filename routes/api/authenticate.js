@@ -6,60 +6,106 @@ const bcrypt = require('bcryptjs')
 const db = require('../../pgp');
 
 router.post('/register', (req, res) => {
-  console.log(req.body)
   db.task('register-user', async t => {
 
-    let user = await db.any(`
-      SELECT * FROM USERS 
-      WHERE email = $1
-    `, [req.body.email])
+    let email = req.body.email
+    let password = req.body.password
+    let firstName = req.body.firstName
+    let lastName = req.body.lastName
 
-    console.log(user)
+    if (email && password && firstName && lastName) {
 
-    if (!checkSignUpForm(req.body.firstName, req.body.lastName, req.body.email, req.body.password)){
-      res.status(400).send("Invalid Request")
-    } else if(user.length != 0){
-      res.status(400).send("Email in use")
-    } else {
-      bcrypt.genSalt(10, function(err, salt) {
-        bcrypt.hash(req.body.password, salt, async function(err, hash){
+      let user = await db.any(`
+        SELECT * FROM USERS 
+        WHERE email = $1
+      `, [req.body.email])
 
-          if (err) console.log(err)
+      console.log(user)
 
-          let fullName = `${req.body.firstName} ${req.body.lastName}`
+      if (!checkSignUpForm(firstName, lastName, email, password)){
+        res.status(400).send("Invalid Request")
+      } else if(user.length != 0){
+        res.status(400).send("Email in use")
+      } else {
+        bcrypt.genSalt(10, function(err, salt) {
+          bcrypt.hash(password, salt, async function(err, hash){
 
-          let friendCode = Math.floor(Math.random() * 1000000000).toString();
-          console.log(`Friend Code: ${friendCode}`)
-          let checkID = await db.any(`
-            SELECT * FROM USERS WHERE code = $1
-          `, [friendCode])
+            if (err) console.log(err)
 
-          while (checkID.length != 0){
+            let fullName = `${firstName} ${lastName}`
+
+            email = email.toLowerCase()
+
             let friendCode = Math.floor(Math.random() * 1000000000).toString();
+            console.log(`Friend Code: ${friendCode}`)
             let checkID = await db.any(`
               SELECT * FROM USERS WHERE code = $1
             `, [friendCode])
-          }
-    
-          let createUser = await db.any(`
-            INSERT INTO USERS 
-            (name, code, created_at, status, email, password)
-            VALUES ($1, $2, clock_timestamp(), 'healthy', $3, $4)
-          `, [fullName, friendCode, req.body.email, hash])
 
-          let newUser = await db.any(`
-            SELECT id FROM users WHERE code = $1
-          `, [friendCode])
+            while (checkID.length != 0){
+              let friendCode = Math.floor(Math.random() * 1000000000).toString();
+              let checkID = await db.any(`
+                SELECT * FROM USERS WHERE code = $1
+              `, [friendCode])
+            }
+      
+            let createUser = await db.any(`
+              INSERT INTO USERS 
+              (name, code, created_at, status, email, password)
+              VALUES ($1, $2, clock_timestamp(), 'healthy', $3, $4)
+            `, [fullName, friendCode, email, hash])
 
-          console.log(newUser)
+            let newUser = await db.any(`
+              SELECT id FROM users WHERE code = $1
+            `, [friendCode])
 
-          res.json({
-            id: newUser[0]
+            console.log(newUser)
+
+            res.json({
+              id: newUser[0]
+            })
           })
         })
-      })
+      }
+    } else {
+      res.status(400).send("Invalid Request")
     }
+    
+    
   })
+})
+
+
+router.post('/login', (req, res) => {
+  console.log(req.body)
+  let password = req.body.password
+  let email = req.body.email
+  if (password && email){
+    email = email.toLowerCase()
+    db.task('log-in', async t => {
+      let user = await db.any(`
+        SELECT * from users where email = $1
+      `, [email])
+      if (user.length == 0){
+        res.send("Invalid Email")
+      } else {
+        console.log(user)
+        bcrypt.compare(password, user[0]["password"], function(err, status){
+          if (status) {
+            res.json({
+              userID: user[0]["id"]
+            })
+          } else {
+            res.send("Invalid Password")
+          }
+        })
+        
+      }
+    })
+  } else {
+    res.status(400).send("Invalid Request")
+  }
+  
 })
 
 var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
