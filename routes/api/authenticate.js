@@ -62,7 +62,7 @@ router.post('/register', (req, res) => {
             console.log(newUser)
 
             res.json({
-              userID: newUser[0]
+              userID: newUser[0]["id"]
             })
           })
         })
