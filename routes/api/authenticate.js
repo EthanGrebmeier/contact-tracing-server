@@ -87,7 +87,7 @@ router.post('/login', (req, res) => {
         SELECT * from users where email = $1
       `, [email])
       if (user.length == 0){
-        res.send("Invalid Email")
+        res.send("Email Not Found")
       } else {
         console.log(user)
         bcrypt.compare(password, user[0]["password"], function(err, status){
@@ -103,7 +103,7 @@ router.post('/login', (req, res) => {
       }
     })
   } else {
-    res.status(400).send("Invalid Request")
+    res.status(200).send("Invalid Request")
   }
   
 })
