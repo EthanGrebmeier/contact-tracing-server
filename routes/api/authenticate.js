@@ -23,9 +23,9 @@ router.post('/register', (req, res) => {
       console.log(user)
 
       if (!checkSignUpForm(firstName, lastName, email, password)){
-        res.status(400).send("Invalid Request")
+        res.status(200).send("Invalid Request")
       } else if(user.length != 0){
-        res.status(400).send("Email in use")
+        res.status(200).send("Email in use")
       } else {
         bcrypt.genSalt(10, function(err, salt) {
           bcrypt.hash(password, salt, async function(err, hash){
@@ -70,8 +70,6 @@ router.post('/register', (req, res) => {
     } else {
       res.status(200).send("Invalid Request")
     }
-    
-    
   })
 })
 
