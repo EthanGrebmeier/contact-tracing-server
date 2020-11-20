@@ -2,8 +2,12 @@ const express = require('express')
 const router = express.Router();
 const db = require('../../pgp');
 
+const authJWT = require('../../authJWT')
+
+
+
 //Get all of a users sessions from UserID
-router.get('/:userID', (req, res) => {
+router.get('/:userID',[authJWT.verifyToken], (req, res) => {
     db.task('get-sessions', async t => {
         console.log(req.params)
         const userSessions = await t.any(`
@@ -37,7 +41,7 @@ router.get('/:userID', (req, res) => {
 })
 
 //Get all of a users people sessions from UserID
-router.get('/people/:userID', (req, res) => {
+router.get('/people/:userID', [authJWT.verifyToken], (req, res) => {
     db.task('get-people-sessions', async t => {
         console.log(req.params)
         const userSessions = await t.any(`
@@ -60,7 +64,7 @@ router.get('/people/:userID', (req, res) => {
 })
 
 // get all of a user's location sessions by ID
-router.get('/locations/:userID', (req, res) => {
+router.get('/locations/:userID', [authJWT.verifyToken], (req, res) => {
     db.task('get-location-sessions', async t => {
         console.log(req.params)
 
@@ -86,7 +90,7 @@ router.get('/locations/:userID', (req, res) => {
 })
 
 //Create a new Location session for a user by userID
-router.post('/locations/', (req, res) => {
+router.post('/locations/', [authJWT.verifyToken], (req, res) => {
     let timeInSplit = req.body.timeIn.split(":")
     let timeOutSplit = req.body.timeOut.split(":")
     let timeIn = new Date(req.body.date)
@@ -141,7 +145,7 @@ router.post('/locations/', (req, res) => {
 
 
 // Create a new person session for a user by UserID
-router.post('/people/', (req, res) => {
+router.post('/people/', [authJWT.verifyToken], (req, res) => {
     db.task('create-people-session', async t => {
         db.any(`  
             INSERT INTO 
@@ -167,7 +171,7 @@ router.post('/people/', (req, res) => {
 
 
 // Accept a session request by User IDs
-router.post('/people/accept', (req, res) => {
+router.post('/people/accept',[authJWT.verifyToken], (req, res) => {
     db.task('accept-people-session', async t => {
         db.any(`  
             INSERT INTO 
@@ -189,7 +193,7 @@ router.post('/people/accept', (req, res) => {
 })
 
 // Decline a session request by Session ID
-router.post('/people/decline', (req, res) => {
+router.post('/people/decline', [authJWT.verifyToken], (req, res) => {
     db.task('decline-people-session', async t => {
         db.any(`  
             DELETE FROM people_sessions_requests 

@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 
 const passport = require('passport')
+const jwt = require('jsonwebtoken')
 const LocalStrategy = require('passport-local').Strategy
 
 const bcrypt = require('bcryptjs')
@@ -24,8 +25,13 @@ passport.use(new LocalStrategy((username, password, cb) => {
           console.log(user)
           bcrypt.compare(password, user[0]["password"], function(err, status){
               if (status) {
-                console.log(user)
-                cb(null, {id: user[0]["id"], username: user[0]["email"]})
+                jwt.sign({userID: user[0].id}, process.env.TOKENSECRET, {
+                  expiresIn: 1209600 // 2 Weeks
+                }, (err, token) => {
+                  console.log(user)
+                  console.log(token)
+                  cb(null, {id: user[0]["id"], username: user[0]["email"], accessToken: token})
+                })
               } else {
               cb(null, false)
               }
@@ -79,7 +85,6 @@ router.post('/register', (req, res) => {
       } else {
         bcrypt.genSalt(10, function(err, salt) {
           bcrypt.hash(password, salt, async function(err, hash){
-
             if (err) console.log(err)
 
             let fullName = `${firstName} ${lastName}`
@@ -128,7 +133,8 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
   console.log(req)
   let {user} = req
   res.json({
-    userID: user["id"]
+    userID: user["id"],
+    accessToken: user["accessToken"]
   })
 })
 
