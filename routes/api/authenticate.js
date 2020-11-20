@@ -68,7 +68,7 @@ router.post('/register', (req, res) => {
         })
       }
     } else {
-      res.status(400).send("Invalid Request")
+      res.status(200).send("Invalid Request")
     }
     
     
