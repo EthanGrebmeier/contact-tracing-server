@@ -155,7 +155,6 @@ function checkForNumber(password){
 }
 
 function checkSignUpForm(firstName, lastName, email, password, confirmPassword){
-  event.preventDefault()
   if (firstName === "" ){
     return false
   } else if (lastName === ""){
