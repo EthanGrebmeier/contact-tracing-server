@@ -11,6 +11,7 @@ verifyToken = async (req, res, next) => {
     SELECT * from users where id = $1
   `, id)
 
+  console.log("USER: ")
   console.log(user)
 
   if (!token) {
@@ -20,6 +21,7 @@ verifyToken = async (req, res, next) => {
   }
 
   jwt.verify(token, process.env.TOKENSECRET, (err, decoded) => {
+    console.log("DECODED")
     console.log(decoded)
     if (err || decoded["userID"] != id) {
       return res.status(401).send({
