@@ -2,8 +2,10 @@ const express = require('express')
 const router = express.Router();
 const db = require('../../pgp');
 
+const authJWT = require('../../authJWT')
 
-router.get('/:userID', (req, res) => {
+
+router.get('/:userID',[authJWT.verifyToken], (req, res) => {
     db.task('get-user', async t => {
         user = await db.one(`
             SELECT name, status, id
@@ -18,7 +20,7 @@ router.get('/:userID', (req, res) => {
 })
 
 //Get all of a User's Connections by ID
-router.get('/connections/:userID', (req, res) => {
+router.get('/connections/:userID', [authJWT.verifyToken], (req, res) => {
     db
         .any(`
         Select user2 as id, u.name 
@@ -39,7 +41,7 @@ router.get('/connections/:userID', (req, res) => {
 
 
 //Create a new connection request
-router.post('/connections', (req, res) => {
+router.post('/connections', [authJWT.verifyToken], (req, res) => {
     db
         .task('send-request', async t => {
             let friend = await db.any(`
@@ -101,7 +103,7 @@ router.post('/connections', (req, res) => {
 
 //DECLINE FRIEND REQUEST BY USER ID
 
-router.post('/connections/decline', (req, res) => {
+router.post('/connections/decline',[authJWT.verifyToken], (req, res) => {
     db.task('decline-friend-request', async t => {
         let request = await db.any(`
             DELETE FROM friend_requests 
@@ -114,7 +116,7 @@ router.post('/connections/decline', (req, res) => {
 
 //REMOVE FRIEND BY USER ID
 
-router.post('/connections/remove', (req, res) => {
+router.post('/connections/remove', [authJWT.verifyToken], (req, res) => {
     db.task('remove-friend', async t => {
         let removed = await db.any(`
             DELETE FROM friends 
@@ -126,7 +128,7 @@ router.post('/connections/remove', (req, res) => {
 
 
 // GET ALL NOTIFICATIONS BY USER ID
-router.get('/notifications/:userID', (req, res) => {
+router.get('/notifications/:userID', [authJWT.verifyToken], (req, res) => {
     let userID = req.params.userID
     db.task('get-notifications', async t => {
 
@@ -190,7 +192,7 @@ router.get('/notifications/:userID', (req, res) => {
 
 
 //Update a user's health status
-router.post('/status', (req, res) => {
+router.post('/status', [authJWT.verifyToken],  (req, res) => {
     let status = req.body.status
     let userID = req.body.userID
     if(status == 'healthy' || status == 'unwell' || status == 'positive'){
