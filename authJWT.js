@@ -7,9 +7,7 @@ verifyToken = async (req, res, next) => {
 
   let id = req.body.userID || req.body.userOneID || req.params.userID
 
-  let user = await db.any(`
-    SELECT * from users where id = $1
-  `, id)
+  console.log(id)
 
   if (!token) {
     return res.status(403).send({
