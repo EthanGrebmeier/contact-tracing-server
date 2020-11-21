@@ -44,59 +44,63 @@ router.get('/connections/:userID', [authJWT.verifyToken], (req, res) => {
 router.post('/connections', [authJWT.verifyToken], (req, res) => {
     db
         .task('send-request', async t => {
-            let friend = await db.any(`
-            SELECT * FROM friends WHERE user1 = $2 and user2 = $1
-            `, [req.body.userOneID, req.body.userTwoID]) 
-            console.log("FRIEND")
-            console.log(friend)
-            if (friend.length == 0){
-                let request = await db.any(`
-                SELECT * FROM friend_requests WHERE user1 = $2 and user2 = $1
-                `, [req.body.userOneID, req.body.userTwoID])
-                console.log("REQUEST")
-                console.log(request)
-                if(request.length == 0){
-                    await db.any(`
-                    INSERT INTO friend_requests (user1, user2) VALUES ($1, $2)
-                    `, [req.body.userOneID, req.body.userTwoID])
-                    res.status(201)
 
-                } else {
-                    await db.any(`
-                    DELETE FROM friend_requests WHERE user1 = $2 and user2 = $1
-                    `, [req.body.userOneID, req.body.userTwoID])
+            let targetUser = await db.any(`
+                SELECT * from users where code = $1
+            `, [req.body.friendCode])
 
-                    await db.any(`
-                    INSERT INTO friends (user1, user2) VALUES ($1, $2)
-                    `, [req.body.userOneID, req.body.userTwoID])
+            if (targetUser.length != 0){
 
-                    await db.any(`
-                    INSERT INTO friends (user1, user2) VALUES ($2, $1)
-                    `, [req.body.userOneID, req.body.userTwoID])
+                let existingFriend = await db.any(`
+                    SELECT * FROM friends WHERE user1 = $2 and user2 = $1
+                `, [req.body.userID, targetUser[0]["id"]]) 
+    
+                if (existingFriend.length == 0){
 
-                    res.status(202)
-                }
+                    let existingRequest = await db.any(`
+                        SELECT * FROM friend_requests WHERE user1 = $1 and user2 = $2
+                    `, [req.body.userID, targetUser[0]["id"]])
 
-                name = await db.any(`
-                    select name from users where id = $1
-                    `, [req.body.userOneID]) 
 
-                console.log(name)
+                    let receivedRequest = await db.any(`
+                        SELECT * FROM friend_requests WHERE user1 = $2 and user2 = $1
+                    `, [req.body.userID, targetUser[0]["id"]])
 
-                res.json({
-                    "connection": {
-                        "userName":  name["name"],
-                        "userID": req.body.userOneID
+                    if (receivedRequest.length == 1){
+                        await db.any(`
+                       DELETE FROM friend_requests WHERE user1 = $2 and user2 = $1
+                       `, [req.body.userID, targetUser[0]["id"]])
+   
+                       await db.any(`
+                       INSERT INTO friends (user1, user2) VALUES ($1, $2)
+                       `, [req.body.userID, targetUser[0]["id"]])
+   
+                       await db.any(`
+                       INSERT INTO friends (user1, user2) VALUES ($2, $1)
+                       `, [req.body.userID, targetUser[0]["id"]]) 
+   
+                       name = await db.any(`
+                       select name from users where id = $1
+                       `, [req.body.userID]) 
+       
+                       res.send("Connection Established!")
+
+                    } else if (existingRequest.length == 0){
+                        await db.any(`
+                        INSERT INTO friend_requests (user1, user2) VALUES ($1, $2)
+                        `, [req.body.userID, req.body.userTwoID])
+                        res.send("Request Sent")
+    
+                    } else {
+                        res.send("Previous Request Pending")
                     }
-                })
-            } else {
-                res.status(208)
-                res.json({
-                    "message": "Connection Already Established"
-                })
+                } else {
+                    res.status(208)
+                    res.json({
+                        "message": "Connection Already Established"
+                    })
+                }
             }
-            
-
         })
 })
 
@@ -108,7 +112,7 @@ router.post('/connections/decline',[authJWT.verifyToken], (req, res) => {
         let request = await db.any(`
             DELETE FROM friend_requests 
             WHERE user2 = $1 and user1 = $2
-        `, [req.body.userOneID, req.body.userTwoID])
+        `, [req.body.userID, req.body.userTwoID])
         res.status(200).send()
     })
 })
@@ -121,7 +125,7 @@ router.post('/connections/remove', [authJWT.verifyToken], (req, res) => {
         let removed = await db.any(`
             DELETE FROM friends 
             where (user1 = $1 and user2 = $2) or (user1 = $2 and user2 = $1)
-        `, [req.body.userOneID, req.body.userTwoID])
+        `, [req.body.userID, req.body.userTwoID])
         res.status(200).send()
     })
 })
