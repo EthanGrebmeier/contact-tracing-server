@@ -8,7 +8,7 @@ verifyToken = async (req, res, next) => {
   let id = req.body.userID || req.body.userOneID || req.params.userID
 
   console.log(id)
-
+  console.log(token)
   if (!token) {
     return res.status(403).send({
       message: "No token provided!"
