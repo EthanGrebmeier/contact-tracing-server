@@ -54,6 +54,10 @@ router.post('/connections', [authJWT.verifyToken], (req, res) => {
                 let existingFriend = await db.any(`
                     SELECT * FROM friends WHERE user1 = $2 and user2 = $1
                 `, [req.body.userID, targetUser[0]["id"]]) 
+
+
+                console.log("existingFriend")
+                console.log(existingFriend)
     
                 if (existingFriend.length == 0){
 
@@ -61,10 +65,16 @@ router.post('/connections', [authJWT.verifyToken], (req, res) => {
                         SELECT * FROM friend_requests WHERE user1 = $1 and user2 = $2
                     `, [req.body.userID, targetUser[0]["id"]])
 
+                    console.log("existingRequest")
+                    console.log(existingRequest)
+
 
                     let receivedRequest = await db.any(`
                         SELECT * FROM friend_requests WHERE user1 = $2 and user2 = $1
                     `, [req.body.userID, targetUser[0]["id"]])
+
+                    console.log("receivedRequest")
+                    console.log(receivedRequest)
 
                     if (receivedRequest.length == 1){
                         await db.any(`
@@ -96,10 +106,10 @@ router.post('/connections', [authJWT.verifyToken], (req, res) => {
                     }
                 } else {
                     res.status(208)
-                    res.json({
-                        "message": "Connection Already Established"
-                    })
+                    res.send("Connection already established")
                 }
+            } else {
+                res.send("User not found")
             }
         })
 })
