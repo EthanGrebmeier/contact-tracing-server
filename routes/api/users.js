@@ -49,6 +49,8 @@ router.post('/connections', [authJWT.verifyToken], (req, res) => {
                 SELECT * from users where code = $1
             `, [req.body.friendCode])
 
+            console.log(targetUser)
+
             if (targetUser.length != 0){
 
                 let existingFriend = await db.any(`
