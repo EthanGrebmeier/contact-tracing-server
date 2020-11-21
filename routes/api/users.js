@@ -68,8 +68,6 @@ router.post('/connections', [authJWT.verifyToken], (req, res) => {
                         SELECT * FROM friend_requests WHERE user1 = $1 and user2 = $2
                     `, [req.body.userID, targetUser[0]["id"]])
 
-                    console.log("existingRequest")
-                    console.log(existingRequest)
 
 
                     let receivedRequest = await db.any(`
@@ -101,7 +99,7 @@ router.post('/connections', [authJWT.verifyToken], (req, res) => {
                     } else if (existingRequest.length == 0){
                         await db.any(`
                         INSERT INTO friend_requests (user1, user2) VALUES ($1, $2)
-                        `, [req.body.userID, req.body.userTwoID])
+                        `, [req.body.userID, targetUser[0]["id"]])
                         res.send("Request Sent")
     
                     } else {
