@@ -50,6 +50,7 @@ router.post('/connections', [authJWT.verifyToken], (req, res) => {
             `, [req.body.friendCode])
 
             console.log(targetUser)
+            console.log(targetUser[0]["id"])
 
             if (targetUser.length != 0){
 
