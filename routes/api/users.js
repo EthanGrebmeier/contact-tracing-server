@@ -132,7 +132,7 @@ router.post('/connections/remove', [authJWT.verifyToken], (req, res) => {
     db.task('remove-friend', async t => {
         let checkRemoved = await db.any(`
             SELECT * FROM friends WHERE (user1 = $1 and user2 = $2) or (user1 = $2 and user2 = $1)
-        `)
+        `, [req.body.userID, req.body.userTwoID])
 
         if (checkRemoved.length != 0) {
             let removed = await db.any(`
