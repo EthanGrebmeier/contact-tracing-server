@@ -173,22 +173,39 @@ router.post('/people/', [authJWT.verifyToken], (req, res) => {
 // Accept a session request by User IDs
 router.post('/people/accept',[authJWT.verifyToken], (req, res) => {
     db.task('accept-people-session', async t => {
-        db.any(`  
-            INSERT INTO 
-            people_sessions (user1, user2, date)
-            values ($1, $2, current_date);
 
-            DELETE FROM people_sessions_requests 
-            WHERE id = $3
-        `, [req.body.userOneID, req.body.userTwoID, req.body.sessionID])
-        .then(resSql => {
-            res.json({
-                "status": "Session Accepted"
-            })
-        })
-        .catch(err => {
-            console.log(err)
-        })
+        let request = await db.any(`
+            SELECT * FROM people_sessions_requests WHERE id = $1
+        `, [req.body.sessionID])
+
+        if (request.length != 0){ 
+            let requestObject = request[0]
+            if (req.body.userID == requestObject["user2"]){
+                let session = await db.any(`  
+                    INSERT INTO 
+                    people_sessions (user1, user2, date)
+                    values ($1, $2, current_date);
+
+                    DELETE FROM people_sessions_requests 
+                    WHERE id = $3
+                `, [requestObject["user2"], requestObject["user1"], req.body.sessionID])
+                .then(resSql => {
+                    res.json({
+                        "status": "Session Accepted"
+                    })
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+            } else {
+                res.send("Invalid User ID")
+            }
+            
+        } else {
+            res.send("Request not found")
+        }
+
+        
     })
 })
 
