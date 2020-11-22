@@ -117,7 +117,7 @@ router.post('/connections/accept', [authJWT.verifyToken], (req, res) => {
                 DELETE FROM friend_requests WHERE user1 = $2 and user2 = $1;
                 INSERT INTO friends (user1, user2) VALUES ($1, $2);
                 INSERT INTO friends (user1, user2) VALUES ($2, $1);
-            `, [req.body.userID, req.body.user2])
+            `, [req.body.userID, req.body.userTwoID])
 
             res.send("Connection established!")
         } else {
