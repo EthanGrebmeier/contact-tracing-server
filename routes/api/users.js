@@ -130,11 +130,21 @@ router.post('/connections/decline',[authJWT.verifyToken], (req, res) => {
 
 router.post('/connections/remove', [authJWT.verifyToken], (req, res) => {
     db.task('remove-friend', async t => {
-        let removed = await db.any(`
-            DELETE FROM friends 
-            where (user1 = $1 and user2 = $2) or (user1 = $2 and user2 = $1)
-        `, [req.body.userID, req.body.userTwoID])
-        res.status(200).send()
+        let checkRemoved = await db.any(`
+            SELECT * FROM friends WHERE (user1 = $1 and user2 = $2) or (user1 = $2 and user2 = $1)
+        `)
+
+        if (checkRemoved.length != 0) {
+            let removed = await db.any(`
+                DELETE FROM friends 
+                where (user1 = $1 and user2 = $2) or (user1 = $2 and user2 = $1)
+            `, [req.body.userID, req.body.userTwoID])
+
+            res.send("Friend Removed")
+        } else {
+            res.send("Friend not found")
+        }
+        
     })
 })
 
