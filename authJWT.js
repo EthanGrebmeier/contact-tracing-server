@@ -17,6 +17,9 @@ verifyToken = async (req, res, next) => {
 
   jwt.verify(token, process.env.TOKENSECRET, (err, decoded) => {
     if (err || decoded["userID"] != id) {
+      if (err){
+        console.log(err)
+      }
       return res.status(401).send({
         message: "Unauthorized!"
       });
