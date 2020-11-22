@@ -190,9 +190,7 @@ router.post('/people/accept',[authJWT.verifyToken], (req, res) => {
                     WHERE id = $3
                 `, [requestObject["user2"], requestObject["user1"], req.body.sessionID])
                 .then(resSql => {
-                    res.json({
-                        "status": "Session Accepted"
-                    })
+                    res.send("Session Added")
                 })
                 .catch(err => {
                     console.log(err)
