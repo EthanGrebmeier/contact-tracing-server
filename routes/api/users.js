@@ -85,7 +85,7 @@ router.post('/connections', [authJWT.verifyToken], (req, res) => {
 
                     } else if (existingRequest.length == 0){
                         await db.any(`
-                        INSERT INTO friend_requests (user1, user2) VALUES ($1, $2)
+                        INSERT INTO friend_requests (user1, user2, timestamp) VALUES ($1, $2, clock_timestamp())
                         `, [req.body.userID, targetUser[0]["id"]])
                         res.send("Request Sent")
     
@@ -119,9 +119,11 @@ router.post('/connections/accept', [authJWT.verifyToken], (req, res) => {
                 INSERT INTO friends (user1, user2) VALUES ($2, $1);
             `, [req.body.userID, req.body.user2])
 
-            res.send("Connection Established!")
+            res.send("Connection established!")
+        } else {
+            res.send("Request not found")
         }
-        res.status(200).send()
+        
     })
 })
 
