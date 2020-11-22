@@ -76,22 +76,12 @@ router.post('/connections', [authJWT.verifyToken], (req, res) => {
 
                     if (receivedRequest.length == 1){
                         await db.any(`
-                       DELETE FROM friend_requests WHERE user1 = $2 and user2 = $1
-                       `, [req.body.userID, targetUser[0]["id"]])
-   
-                       await db.any(`
-                       INSERT INTO friends (user1, user2) VALUES ($1, $2)
-                       `, [req.body.userID, targetUser[0]["id"]])
-   
-                       await db.any(`
-                       INSERT INTO friends (user1, user2) VALUES ($2, $1)
-                       `, [req.body.userID, targetUser[0]["id"]]) 
-   
-                       name = await db.any(`
-                       select name from users where id = $1
-                       `, [req.body.userID]) 
-       
-                       res.send("Connection Established!")
+                            DELETE FROM friend_requests WHERE user1 = $2 and user2 = $1;
+                            INSERT INTO friends (user1, user2) VALUES ($1, $2);
+                            INSERT INTO friends (user1, user2) VALUES ($2, $1);
+                        `, [req.body.userID, targetUser[0]["id"]])
+        
+                        res.send("Connection Established!")
 
                     } else if (existingRequest.length == 0){
                         await db.any(`
@@ -110,6 +100,29 @@ router.post('/connections', [authJWT.verifyToken], (req, res) => {
                 res.send("User not found")
             }
         })
+})
+
+
+//ACCEPT FRIEND REQUEST BY USER ID
+
+router.post('/connections/accept', [authJWT.verifyToken], (req, res) => {
+    db.task('accept-friend-request', async t => {
+        let request = await db.any(`
+            SELECT * FROM friend_requests 
+            WHERE user2 = $1 and user1 = $2
+        `, [req.body.userID, req.body.userTwoID])
+
+        if (request.length != 0){
+            let acceptedRequest = await db.any(`
+                DELETE FROM friend_requests WHERE user1 = $2 and user2 = $1;
+                INSERT INTO friends (user1, user2) VALUES ($1, $2);
+                INSERT INTO friends (user1, user2) VALUES ($2, $1);
+            `, [req.body.userID, req.body.user2])
+
+            res.send("Connection Established!")
+        }
+        res.status(200).send()
+    })
 })
 
 
