@@ -10,8 +10,9 @@ verifyToken = async (req, res, next) => {
   console.log(id)
   console.log(token)
 
+  console.log("COOKIES")
   console.log(req.cookies)
-  
+
   if (!token) {
     return res.status(403).send({
       message: "No token provided!"
