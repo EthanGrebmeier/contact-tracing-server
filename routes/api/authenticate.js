@@ -132,9 +132,9 @@ router.post('/register', (req, res) => {
 router.post('/login', passport.authenticate('local'), (req, res) => {
   console.log(req)
   let {user} = req
+  res.cookie("accessToken", user["accessToken"])
   res.json({
     userID: user["id"],
-    accessToken: user["accessToken"]
   })
 })
 
