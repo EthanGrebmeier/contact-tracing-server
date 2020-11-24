@@ -156,7 +156,7 @@ router.post('/people/', [authJWT.verifyToken], (req, res) => {
             people_sessions_requests (user1, user2, timestamp)
             values ($1, $2, clock_timestamp());
 
-        `, [req.body.userOneID, req.body.userTwoID])
+        `, [req.body.userID, req.body.userTwoID])
         .then(resSql => {
             res.json({
                 "status": "Session Created"

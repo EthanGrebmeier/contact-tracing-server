@@ -12,6 +12,7 @@ const db = require('./pgp');
 const port = process.env.PORT || 5000
 
 
+
 // Parse incoming requests data 
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: false })); 
@@ -20,7 +21,7 @@ app.use(cors({
     credentials: true
 }))
 
-
+app.use(cookieParser())
 
 app.use('/api/authenticate', require('./routes/api/authenticate'))
 
