@@ -1,8 +1,11 @@
 const express = require('express')
+const cookieParser = require('cookie-parser');
 const router = express.Router();
 const db = require('../../pgp');
 
 const authJWT = require('../../authJWT')
+
+router.use(cookieParser())
 
 
 router.get('/:userID',[authJWT.verifyToken], (req, res) => {
