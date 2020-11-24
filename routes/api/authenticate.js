@@ -41,11 +41,13 @@ passport.use(new LocalStrategy((username, password, cb) => {
 }))
 
 passport.serializeUser((user, done) => {
+  console.log("serialize")
   console.log(user)
   done(null, user.id)
 })
 
 passport.deserializeUser((id, cb) => {
+  console.log("deserialize")
   db.task('deserialize', async t => {
 
       let user = await db.any(`
