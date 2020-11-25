@@ -5,6 +5,8 @@ const db = require("./pgp");
 verifyToken = async (req, res, next) => {
   let token = req.cookies["access-token"];
 
+  console.log(token)
+
   let id = req.body.userID || req.body.userOneID || req.params.userID
 
   if (!token) {
