@@ -147,6 +147,12 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
   })
 })
 
+router.post('/logout', passport.authenticate('local'), (req, res) => {
+  res.cookie("accessToken", "", {expires: new Date(2000), httpOnly: true, sameSite: "none", secure: true })
+  res.send()
+})
+
+
 var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
 
 function isEmailValid(email) {
