@@ -3,15 +3,9 @@ const jwt = require("jsonwebtoken");
 const db = require("./pgp");
 
 verifyToken = async (req, res, next) => {
-  let token = req.headers["x-access-token"];
+  let token = req.cookies["access-token"];
 
   let id = req.body.userID || req.body.userOneID || req.params.userID
-
-  console.log(id)
-  console.log(token)
-
-  console.log("COOKIES")
-  console.log(req.cookies)
 
   if (!token) {
     return res.status(403).send({
