@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken");
-
+ 
 const db = require("./pgp");
 
 verifyToken = async (req, res, next) => {
-  let token = req.cookies["access-token"];
+  let token = req.cookies["accessToken"];
 
   console.log(token)
 
