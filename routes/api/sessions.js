@@ -99,7 +99,7 @@ router.post('/locations/', [authJWT.verifyToken], (req, res) => {
     timeIn.setMinutes(timeInSplit[1])
     timeOut.setHours(timeOutSplit[0])
     timeOut.setMinutes(timeOutSplit[1])
-    let timeInString = `${timeIn.getFullYear()}-${timeIn.getMonth() + 1}-${timeIn.getDate()} ${timeIn.getHours()}:${timeIn.getMinutes() + 1}:00`
+    let timeInString = `${timeIn.getFullYear()}-${timeIn.getMonth() + 1}-${timeIn.getDate()+1} ${timeIn.getHours()}:${timeIn.getMinutes() + 1}:00`
     let timeOutString = `${timeOut.getFullYear()}-${timeOut.getMonth() + 1}-${timeOut.getDate()} ${timeOut.getHours()}:${timeOut.getMinutes() + 1}:00`
 
     console.log("Got Location request")
@@ -150,13 +150,13 @@ router.post('/people/', [authJWT.verifyToken], (req, res) => {
         db.any(`  
             INSERT INTO 
             people_sessions (user1, user2, date)
-            values ($1, $2, current_date);
+            values ($1, $2, $3);
                             
             INSERT INTO 
             people_sessions_requests (user1, user2, timestamp)
             values ($1, $2, clock_timestamp());
 
-        `, [req.body.userID, req.body.userTwoID])
+        `, [req.body.userID, req.body.userTwoID, req.body.date])
         .then(resSql => {
             res.json({
                 "status": "Session Created"
