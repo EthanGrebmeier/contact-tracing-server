@@ -132,12 +132,11 @@ router.post('/locations/', [authJWT.verifyToken], (req, res) => {
 
         `, [req.body.userID, req.body.locationID, req.body.locationName, req.body.date, timeInString, timeOutString])
         .then(resSql => {
-            res.json({
-                "status": "Session Created"
-            })
+            res.send("Session Created")
         })
         .catch(err => {
             console.log(err)
+            res.send("Something went wrong")
         })
     }
 
