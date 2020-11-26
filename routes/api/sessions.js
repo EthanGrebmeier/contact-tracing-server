@@ -103,6 +103,7 @@ router.post('/locations/', [authJWT.verifyToken], (req, res) => {
     let timeOutString = `${timeOut.getFullYear()}-${timeOut.getMonth() + 1}-${timeOut.getDate()} ${timeOut.getHours()}:${timeOut.getMinutes() + 1}:00`
 
     console.log("Got Location request")
+    console.log(req.body.date)
 
     if (timeIn > timeOut){
         res.status(400).json({
