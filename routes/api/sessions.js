@@ -229,7 +229,7 @@ router.post('/people/decline', [authJWT.verifyToken], (req, res) => {
 checkTwoWeeks = (date) => {
 
     let today = new Date()
-    if ((today - 1209600000 < date)){
+    if ((today - 1209600000 > date)){
         return false
     } 
     return true
