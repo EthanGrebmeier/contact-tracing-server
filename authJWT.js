@@ -5,10 +5,14 @@ const db = require("./pgp");
 verifyToken = async (req, res, next) => {
   let token = req.cookies["accessToken"];
 
+  console.log("Token")
   console.log(token)
 
   let id = req.body.userID || req.body.userOneID || req.params.userID
 
+  console.log("ID")
+  console.log(id)
+  
   if (!token) {
     return res.status(403).send({
       message: "No token provided!"
