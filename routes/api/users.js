@@ -2,7 +2,7 @@ const express = require('express')
 const cookieParser = require('cookie-parser');
 const router = express.Router();
 const nodemailer = require('nodemailer')
-const smtpTransport = require('nodemailer-smtp-transport');
+const ejs = require('ejs')
 const db = require('../../pgp');
 
 const authJWT = require('../../authJWT')
@@ -348,29 +348,25 @@ let emailWarning = async (session, sessionType) => {
 
         let html;
         if (sessionType === "peopleSession"){
-            html = `
-                <div style="display: flex; justify-content: center; align-items: center; height: 500px; background-color: #93B5C6;" > 
-                    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #F0CF65; border: 4px solid black; border-radius: 12px; height: 40%; width: 60%; text-align: center;" >
-                        <h1 style="font-size: 32px"> Traace </h1>
-                        <p style="width: 50%;"> 
-                            Traace has been notified that ${session["name"]}, who you saw on ${dateString}, has tested positive for Covid-19. 
-                            We recommend that you self quarantine, and get tested as soon as possible
-                        </p>
-                    </div>
-                </div>
-            `
+            html = ejs.renderFile('../../peopleSession.ejs', {name: session["name"], dateString: dateString}, (err, data) => {
+                if (err) {
+                    console.log(err)
+                } else {
+                    console.log("PEOPLE HTML: ")
+                    console.log(data)
+                    return data
+                }
+            })
         } else {
-            html = `
-                <div style="display: flex; justify-content: center; align-items: center; height: 500px; background-color: #93B5C6;" > 
-                    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #F0CF65; border: 4px solid black; border-radius: 12px; height: 40%; width: 60%; text-align: center;" >
-                        <h1 style="font-size: 32px"> Traace </h1>
-                        <p style="width: 50%;"> 
-                                    Traace has been notified that somebody visiting ${session["name"]} at the same time as you on ${session["date"]}, has tested positive for Covid-19. 
-                                    We recommend that you self quarantine, and get tested as soon as possible
-                        </p>
-                    </div>
-                </div>
-            `
+            html = ejs.renderFile('../../peopleSession.ejs', {name: session["name"], dateString: dateString}, (err, data) => {
+                if (err) {
+                    console.log(err)
+                } else {
+                    console.log("PLACE HTML: ")
+                    console.log(data)
+                    return data
+                }
+            })
         }
 
 
