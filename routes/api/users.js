@@ -330,16 +330,15 @@ let emailWarning = async (session, sessionType) => {
     console.log(session)
 
     let user = await db.any(` SELECT email FROM users WHERE id = $1`, [session["user2"]])
-
     if (user.length > 0){
-        let transporter = nodemailer.createTransport(smtpTransport({
+        console.log(user[0])
+        let transporter = nodemailer.createTransport({
             service: 'gmail',
-            host: 'smtp.gmail.com',
             auth: {
                 user: process.env.GMAIL_USER,
                 pass: process.env.GMAIL_PASSWORD
             }
-        }))
+        })
 
         let subject = "Potential Covid-19 Exposure"
 
