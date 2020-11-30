@@ -99,8 +99,8 @@ router.post('/locations/', [authJWT.verifyToken], (req, res) => {
     timeIn.setMinutes(timeInSplit[1])
     timeOut.setHours(timeOutSplit[0])
     timeOut.setMinutes(timeOutSplit[1])
-    let timeInString = `${timeIn.getFullYear()}-${timeIn.getMonth() + 1}-${timeIn.getDate()+1} ${timeIn.getHours()}:${timeIn.getMinutes() + 1}:00`
-    let timeOutString = `${timeOut.getFullYear()}-${timeOut.getMonth() + 1}-${timeOut.getDate()} ${timeOut.getHours()}:${timeOut.getMinutes() + 1}:00`
+    let timeInString = `${timeIn.getUTCFullYear()}-${timeIn.getUTCMonth() + 1}-${timeIn.getUTCDate()} ${timeIn.getUTCHours()}:${timeIn.getUTCMinutes() + 1}:00`
+    let timeOutString = `${timeOut.getUTCFullYear()}-${timeOut.getUTCMonth() + 1}-${timeOut.getUTCDate()} ${timeOut.getUTCHours()}:${timeOut.getUTCMinutes() + 1}:00`
 
     console.log("Got Location request")
     console.log(req.body.date)
