@@ -248,9 +248,9 @@ router.post('/status', [authJWT.verifyToken],  (req, res) => {
             if (status == 'positive' || status == 'unwell'){
                 // Checks what people the user has seen in the last two weeks
                 peopleSeen = await db.any(`
-                    SELECT ps.id, u.name, date 
+                    SELECT ps.id, ps.user1 as userID, ps.user2, u.name, date 
                     FROM people_sessions ps
-                    JOIN users u on u.id = ps.user2
+                    JOIN users u on u.id = ps.user1
                     WHERE user1 = $1
                 `, [userID])
 
@@ -286,8 +286,8 @@ let notifyContacts = async (peopleSeen, status) => {
     console.log("PEOPLE")
     console.log(peopleSeen)
     for(people in peopleSeen){
-        id = peopleSeen[people].id
-        let notifiedPerson = await db.any(`INSERT INTO people_sessions_warnings (session_id, type, timestamp) values ($1, $2, clock_timestamp()) `, [id, status])
+        let sessionID = peopleSeen[people].id
+        let notifiedPerson = await db.any(`INSERT INTO people_sessions_warnings (session_id, type, timestamp) values ($1, $2, clock_timestamp()) `, [sessionID, status])
         emailWarning(peopleSeen[people], "peopleSession")
     }
 }
@@ -302,7 +302,7 @@ let notifyVisitors = async (places) => {
         let timeEnd = places[place].time_end
         let notifiedVisitors = await db.any(`
             SELECT ls.id, user_id, l.name, ls.date  
-            FROM locations_sessions as ls
+            FROM locations_sessions ls
             WHERE location_id = $1 
             JOIN locations l ON l.id = ls.location_id 
             AND (
@@ -326,8 +326,10 @@ let notifyOneVisitor = async (session) => {
 
 let emailWarning = async (session, sessionType) => {
     // TODO
+    console.log("EMAIL SESSION: ")
+    console.log(session)
 
-    let user = await db.any(` SELECT email FROM users WHERE id = $1`, [userID])
+    let user = await db.any(` SELECT email FROM users WHERE id = $1`, [session["user2"]])
 
     if (user.length > 0){
         let transporter = nodemailer.createTransport(smtpTransport({
