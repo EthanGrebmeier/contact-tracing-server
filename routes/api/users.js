@@ -329,9 +329,6 @@ let emailWarning = async (session, sessionType) => {
     console.log("EMAIL SESSION: ")
     console.log(session)
 
-    console.log(process.env.GMAIL_USER)
-    console.log(process.env.GMAIL_PASSWORD)
-
     let user = await db.any(` SELECT email FROM users WHERE id = $1`, [session["user2"]])
     if (user.length > 0){
         console.log(user[0])
@@ -345,7 +342,7 @@ let emailWarning = async (session, sessionType) => {
 
         let subject = "Potential Covid-19 Exposure"
 
-        let html 
+        let html;
         if (sessionType === "peopleSession"){
             html = `
                 <style>
