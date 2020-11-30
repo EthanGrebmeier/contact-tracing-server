@@ -1,6 +1,8 @@
 const express = require('express')
 const cookieParser = require('cookie-parser');
 const router = express.Router();
+const nodemailer = require('nodemailer')
+const smtpTransport = require('nodemailer-smtp-transport');
 const db = require('../../pgp');
 
 const authJWT = require('../../authJWT')
@@ -286,7 +288,7 @@ let notifyContacts = async (peopleSeen, status) => {
     for(people in peopleSeen){
         id = peopleSeen[people].id
         let notifiedPerson = await db.any(`INSERT INTO people_sessions_warnings (session_id, type, timestamp) values ($1, $2, clock_timestamp()) `, [id, status])
-        emailWarning()
+        emailWarning(peopleSeen[people], "peopleSession")
     }
 }
 
@@ -299,30 +301,135 @@ let notifyVisitors = async (places) => {
         let timeStart = places[place].time_start
         let timeEnd = places[place].time_end
         let notifiedVisitors = await db.any(`
-            SELECT user_id 
-            FROM locations_sessions
+            SELECT ls.id, user_id, l.name, ls.date  
+            FROM locations_sessions as ls
             WHERE location_id = $1 
+            JOIN locations l ON l.id = ls.location_id 
             AND (
-                time_start between $2 and $3
-                OR time_end between $2 and $3
+                ls.time_start between $2 and $3
+                ls.OR time_end between $2 and $3
             )
         `, [locationID, timeStart, timeEnd])
-        for (user in notifiedVisitors){
-            console.log(user.user_id)
-            notifyOneVisitor(notifiedVisitors[user])
+        for (session in notifiedVisitors){
+            console.log(session)
+            notifyOneVisitor(notifiedVisitors[session])
         }
     }
 }
 
 
 //Notifies the creator of the overlapping session
-let notifyOneVisitor = async (userID) => {
-    let notifiedVisitor = await db.any(`INSERT INTO locations_sessions_warnings (session_id, date) values ($1, clock_timestamp()) `, [userID])
-    emailWarning()
+let notifyOneVisitor = async (session) => {
+    let notifiedVisitor = await db.any(`INSERT INTO locations_sessions_warnings (session_id, date) values ($1, clock_timestamp()) `, [session["id"]])
+    emailWarning(session, "placesSession")
 } 
 
-let emailWarning = () => {
+let emailWarning = async (session, sessionType) => {
     // TODO
+
+    let user = await db.any(` SELECT email FROM users WHERE id = $1`, [userID])
+
+    if (user.length > 0){
+        let transporter = nodemailer.createTransport(smtpTransport({
+            service: 'gmail',
+            host: 'smtp.gmail.com',
+            auth: {
+                user: process.env.GMAIL_USER,
+                pass: process.env.GMAIL_PASSWORD
+            }
+        }))
+
+        let subject = "Potential Covid-19 Exposure"
+
+        let html 
+        if (sessionType === "peopleSession"){
+            html = `
+                <style>
+                    .email, .email-content{
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                    }
+
+                    .email{
+                        height: 100%;
+                        background-color: #93B5C6;
+                    }
+
+                    .email-content{
+                        background-color: #F0CF65;
+                        border: 4px solid black;
+                        border-radius: 12px;
+                        height: 30%;
+                        width: 40%;
+                        text-align: center;
+                    }
+
+                </style>
+                <div class="email"> 
+                    <div class="email-content">
+                        <h1> Traace </h1>
+                        <p class="notification-text"> 
+                            Traace has been notified that ${session["name"]}, who you saw on ${session["date"]}, has tested positive for Covid-19. 
+                            We recommend that you self quarantine, and get tested as soon as possible
+                        </p>
+                    </div>
+                    
+                </div>
+            `
+        } else {
+            html = `
+                <style>
+                    .email, .email-content{
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                    }
+
+                    .email{
+                        height: 100%;
+                        background-color: #93B5C6;
+                    }
+
+                    .email-content{
+                        background-color: #F0CF65;
+                        border: 4px solid black;
+                        border-radius: 12px;
+                        height: 30%;
+                        width: 40%;
+                        text-align: center;
+                    }
+
+                </style>
+
+                <div class="email"> 
+                    <h1> Traace </h1>
+                    <p class="notification-text"> 
+                        Traace has been notified that somebody visiting ${session["name"]} at the same time as you on ${session["date"]}, has tested positive for Covid-19. 
+                        We recommend that you self quarantine, and get tested as soon as possible
+                    </p>
+                </div>
+            `
+        }
+
+
+        const mailOptions = {
+            from: process.env.GMAIL_USER,
+            to: user[0]["email"],
+            subject: subject,
+            html: html
+        }
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error)
+            } else {
+                console.log('Email sent: ' + info.response)
+            }
+        })
+    }
 }
 
 let addNotificationType = (notifications, type) => {
