@@ -358,7 +358,7 @@ let emailWarning = async (session, sessionType) => {
                 }
             })
         } else {
-            html = ejs.renderFile('../../peopleSession.ejs', {name: session["name"], dateString: dateString}, (err, data) => {
+            html = ejs.renderFile('../../placesSession.ejs', {name: session["name"], dateString: dateString}, (err, data) => {
                 if (err) {
                     console.log(err)
                 } else {
