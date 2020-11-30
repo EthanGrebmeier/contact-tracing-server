@@ -10,21 +10,28 @@ const authJWT = require('../../authJWT')
 router.get('/:userID',[authJWT.verifyToken], (req, res) => {
     db.task('get-sessions', async t => {
         console.log(req.params)
+
+        let twoWeeks = new Date()
+        twoWeeks.setDate(twoWeeks.getDate() - 14)
+        let minDateString = `${twoWeeks.getUTCFullYear()}-${twoWeeks.getUTCMonth() + 1}-${twoWeeks.getUTCDate()}`
+
         const userSessions = await t.any(`
         Select u.name, date 
         from people_sessions ps
         join users u on u.id = ps.user2 
         where user1 = $1
+        and date > $2
         order by date desc
-        `, [req.params.userID])
+        `, [req.params.userID, minDateString])
 
         const locationSessions = await t.any(`
         Select l.name, ls.date 
         from locations_sessions ls
         join locations l on l.id = ls.location_id
         where user_id = $1
+        and date > $2
         order by ls.date desc
-        `, [req.params.userID])
+        `, [req.params.userID, minDateString])
         return {userSessions, locationSessions}
 
     })
@@ -44,13 +51,19 @@ router.get('/:userID',[authJWT.verifyToken], (req, res) => {
 router.get('/people/:userID', [authJWT.verifyToken], (req, res) => {
     db.task('get-people-sessions', async t => {
         console.log(req.params)
+
+        let twoWeeks = new Date()
+        twoWeeks.setDate(twoWeeks.getDate() - 14)
+        let minDateString = `${twoWeeks.getUTCFullYear()}-${twoWeeks.getUTCMonth() + 1}-${twoWeeks.getUTCDate()}`
+
         const userSessions = await t.any(`
         Select u.name, date 
         from people_sessions ps
         join users u on u.id = ps.user2 
         where user1 = $1
+        and date > $2
         order by date desc
-        `, [req.params.userID])
+        `, [req.params.userID, minDateString])
     })
     .then( (obj) => {
         console.log(obj)
@@ -68,13 +81,18 @@ router.get('/locations/:userID', [authJWT.verifyToken], (req, res) => {
     db.task('get-location-sessions', async t => {
         console.log(req.params)
 
+        let twoWeeks = new Date()
+        twoWeeks.setDate(twoWeeks.getDate() - 14)
+        let minDateString = `${twoWeeks.getUTCFullYear()}-${twoWeeks.getUTCMonth() + 1}-${twoWeeks.getUTCDate()}`
+
         const locationSessions = await t.any(`
         Select l.name, ls.date 
         from locations_sessions ls
         join locations l on l.id = ls.location_id
         where user_id = $1
+        and date > $2
         order by ls.date desc
-        `, [req.params.userID])
+        `, [req.params.userID, minDateString])
         return {locationSessions}
 
     })
