@@ -340,77 +340,35 @@ let emailWarning = async (session, sessionType) => {
             }
         })
 
+        let date = new Date(session["date"])
+
+        let dateString = date.toUTCString().substr(0, 16)
+
         let subject = "Potential Covid-19 Exposure"
 
         let html;
         if (sessionType === "peopleSession"){
             html = `
-                <style>
-                    .email, .email-content{
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: center;
-                    }
-
-                    .email{
-                        height: 100%;
-                        background-color: #93B5C6;
-                    }
-
-                    .email-content{
-                        background-color: #F0CF65;
-                        border: 4px solid black;
-                        border-radius: 12px;
-                        height: 30%;
-                        width: 40%;
-                        text-align: center;
-                    }
-
-                </style>
-                <div class="email"> 
-                    <div class="email-content">
+                <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; background-color: #93B5C6;"> 
+                    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #F0CF65; border: 4px solid black; border-radius: 12px; height: 40%; width: 60%; text-align: center;" >
                         <h1> Traace </h1>
                         <p class="notification-text"> 
-                            Traace has been notified that ${session["name"]}, who you saw on ${session["date"]}, has tested positive for Covid-19. 
+                            Traace has been notified that ${session["name"]}, who you saw on ${dateString}, has tested positive for Covid-19. 
                             We recommend that you self quarantine, and get tested as soon as possible
                         </p>
                     </div>
-                    
                 </div>
             `
         } else {
             html = `
-                <style>
-                    .email, .email-content{
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: center;
-                    }
-
-                    .email{
-                        height: 100%;
-                        background-color: #93B5C6;
-                    }
-
-                    .email-content{
-                        background-color: #F0CF65;
-                        border: 4px solid black;
-                        border-radius: 12px;
-                        height: 30%;
-                        width: 40%;
-                        text-align: center;
-                    }
-
-                </style>
-
-                <div class="email"> 
-                    <h1> Traace </h1>
-                    <p class="notification-text"> 
-                        Traace has been notified that somebody visiting ${session["name"]} at the same time as you on ${session["date"]}, has tested positive for Covid-19. 
-                        We recommend that you self quarantine, and get tested as soon as possible
-                    </p>
+                <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; background-color: #93B5C6;"> 
+                    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #F0CF65; border: 4px solid black; border-radius: 12px; height: 40%; width: 60%; text-align: center;" >
+                        <h1> Traace </h1>
+                        <p class="notification-text"> 
+                            Traace has been notified that somebody visiting ${session["name"]} at the same time as you on ${session["date"]}, has tested positive for Covid-19. 
+                            We recommend that you self quarantine, and get tested as soon as possible
+                        </p>
+                    </div>
                 </div>
             `
         }
