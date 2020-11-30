@@ -348,7 +348,7 @@ let emailWarning = async (session, sessionType) => {
 
         let html;
         if (sessionType === "peopleSession"){
-            html = ejs.renderFile(__dirname + '../../peopleSession.ejs', {name: session["name"], dateString: dateString}, (err, data) => {
+            html = ejs.renderFile(__dirname + '/peopleSession.ejs', {name: session["name"], dateString: dateString}, (err, data) => {
                 if (err) {
                     console.log(err)
                 } else {
@@ -358,7 +358,7 @@ let emailWarning = async (session, sessionType) => {
                 }
             })
         } else {
-            html = ejs.renderFile(__dirname + '../../placesSession.ejs', {name: session["name"], dateString: dateString}, (err, data) => {
+            html = ejs.renderFile(__dirname + '/placesSession.ejs', {name: session["name"], dateString: dateString}, (err, data) => {
                 if (err) {
                     console.log(err)
                 } else {
