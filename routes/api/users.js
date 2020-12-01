@@ -2,7 +2,7 @@ const express = require('express')
 const cookieParser = require('cookie-parser');
 const router = express.Router();
 const nodemailer = require('nodemailer')
-const ejs = require('ejs')
+const smtpTransport = require('nodemailer-smtp-transport');
 const db = require('../../pgp');
 
 const authJWT = require('../../authJWT')
@@ -346,56 +346,74 @@ let emailWarning = async (session, sessionType) => {
 
         let subject = "Potential Covid-19 Exposure"
 
+        let html;
         if (sessionType === "peopleSession"){
-            ejs.renderFile(__dirname + '/peopleSession.ejs', {name: session["name"], dateString: dateString}, (err, data) => {
-                if (err) {
-                    console.log(err)
-                } else {
-                    console.log("PEOPLE HTML: ")
-                    console.log(data)
-                    const mailOptions = {
-                        from: process.env.GMAIL_USER,
-                        to: user[0]["email"],
-                        subject: subject,
-                        html: data
-                    }
-            
-                    transporter.sendMail(mailOptions, (error, info) => {
-                        if (error) {
-                            console.log(error)
-                        } else {
-                            console.log('Email sent: ' + info.response)
-                        }
-                    })
+            html = `
+            <body>
+                <style>
+                @font-face {
+                    font-family: Montserrat;
+                    src: url(https://fonts.googleapis.com/css2?family=Montserrat&display=swap);
                 }
-            })
+                </style>
+
+                <div style="height: 400px; position: relative; background-color: #93B5C6; font-family: 'Montserrat'; text-align: center;">
+                    <table style="margin: 0; width:80%; position: absolute; top: 50%; transform: translateY(-50%) translateX(-50%) ; left: 50%;  background-color: #F0CF65; border: 4px solid black; border-radius: 12px; height: 40%; width: 60%; padding: 40px;">
+                        <tr>
+                        <th style="font-size: 48px">Traace</th>
+                        </tr>
+                        <tr style="width: 20%;">
+                        <td>Traace has been notified that ${session["name"]}, who you saw on ${dateString}, has tested positive for Covid-19. 
+                        We recommend that you self quarantine, and get tested as soon as possible</td>
+                        </tr>
+                    </table>
+
+                
+                </div>
+            </body>
+            `
         } else {
-            ejs.renderFile(__dirname + '/placesSession.ejs', {name: session["name"], dateString: dateString}, (err, data) => {
-                if (err) {
-                    console.log(err)
-                } else {
-                    console.log("PLACE HTML: ")
-                    console.log(data)
-                    const mailOptions = {
-                        from: process.env.GMAIL_USER,
-                        to: user[0]["email"],
-                        subject: subject,
-                        html: data
-                    }
-            
-                    transporter.sendMail(mailOptions, (error, info) => {
-                        if (error) {
-                            console.log(error)
-                        } else {
-                            console.log('Email sent: ' + info.response)
-                        }
-                    })
+            html = `
+            <body>
+                <style>
+                @font-face {
+                    font-family: Montserrat;
+                    src: url(https://fonts.googleapis.com/css2?family=Montserrat&display=swap);
                 }
-            })
+                </style>
+
+                <div style="height: 400px; position: relative; background-color: #93B5C6; font-family: 'Montserrat'; text-align: center;">
+                    <table style="margin: 0; width:80%; position: absolute; top: 50%; transform: translateY(-50%) translateX(-50%) ; left: 50%;  background-color: #F0CF65; border: 4px solid black; border-radius: 12px; height: 40%; width: 60%; padding: 40px;">
+                        <tr>
+                        <th style="font-size: 48px">Traace</th>
+                        </tr>
+                        <tr style="width: 20%;">
+                        <td>Traace has been notified that somebody visiting ${session["name"]} at the same time as you on ${dateString}, has tested positive for Covid-19. 
+                        We recommend that you self quarantine, and get tested as soon as possible</td>
+                        </tr>
+                    </table>
+
+                
+                </div>
+            </body>
+            `
         }
 
 
-        
+        const mailOptions = {
+            from: process.env.GMAIL_USER,
+            to: user[0]["email"],
+            subject: subject,
+            html: html
+        }
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error)
+            } else {
+                console.log('Email sent: ' + info.response)
+            }
+        })
     }
 }
 
