@@ -246,13 +246,18 @@ router.post('/status', [authJWT.verifyToken],  (req, res) => {
 
             // Only runs on positive test or feeling unwell
             if (status == 'positive' || status == 'unwell'){
+
+                let twoWeeks = new Date()
+                twoWeeks.setDate(twoWeeks.getDate() - 14)
+                let minDateString = `${twoWeeks.getUTCFullYear()}-${twoWeeks.getUTCMonth() + 1}-${twoWeeks.getUTCDate()}`
                 // Checks what people the user has seen in the last two weeks
                 peopleSeen = await db.any(`
                     SELECT ps.id, ps.user1 as userID, ps.user2, u.name, date 
                     FROM people_sessions ps
                     JOIN users u on u.id = ps.user1
                     WHERE user1 = $1
-                `, [userID])
+                    and date > $2
+                `, [userID, minDateString])
 
                 // Notifies people that are recorded as having direct contact in the last two weeks
                 notifyContacts(peopleSeen, status)
@@ -263,7 +268,8 @@ router.post('/status', [authJWT.verifyToken],  (req, res) => {
                         SELECT location_id, time_start, time_end 
                         FROM locations_sessions
                         WHERE user_id = $1
-                    `, [userID])
+                        and date > $2
+                    `, [userID, minDateString])
 
                     // Notifies people that were at the same place at the same time in the last two weeks
                     notifyVisitors(placesVisited)
