@@ -4,7 +4,7 @@ const router = express.Router()
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
 const LocalStrategy = require('passport-local').Strategy
-
+const GoogleStrategy = require('passport-google-oauth20').Strategy
 const bcrypt = require('bcryptjs')
 
 const db = require('../../pgp');
@@ -38,6 +38,17 @@ passport.use(new LocalStrategy((username, password, cb) => {
           })
       }
   })
+}))
+
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: "/api/authenticate/login/google/"
+},
+(accessToken, refreshToken, profile, cb) => {
+  console.log(JSON.stringify(profile))
+  return cb (null, profile)
 }))
 
 passport.serializeUser((user, done) => {
@@ -153,6 +164,83 @@ router.post('/logout', passport.authenticate('local'), (req, res) => {
   res.cookie("accessToken", "", {expires: new Date(2000), httpOnly: true, sameSite: "none", secure: true })
   res.send()
 })
+
+router.get('/login/google', passport.authenticate("google", {
+  scope: ["profile", "email"]
+}), (req, res) => {
+
+    let {user} = req
+
+    console.log("USER")
+    console.log(user)
+
+    
+    db.task('login-google', async t => {
+      let currentUser = await db.any(`
+        SELECT * FROM USERS 
+        WHERE email = $1
+      `, [user["emails"][0]["value"]])
+
+      if (currentUser.length === 0){
+
+        let friendCode = Math.floor(Math.random() * 1000000000).toString();
+        console.log(`Friend Code: ${friendCode}`)
+        let checkID = await db.any(`
+          SELECT * FROM USERS WHERE code = $1
+        `, [friendCode])
+
+        while (checkID.length != 0){
+          let friendCode = Math.floor(Math.random() * 1000000000).toString();
+          let checkID = await db.any(`
+            SELECT * FROM USERS WHERE code = $1
+          `, [friendCode])
+        }
+
+
+        let newUser = await db.any(`
+          INSERT INTO users (name, code, created_at, status, email) values ($1, $2, clock_timestamp(), 'healthy', $3)
+        `, [user["displayName"], friendCode, user["emails"][0]["value"]])
+
+        currentUser = await db.any(`
+          SELECT * FROM USERS 
+          WHERE email = $1
+        `, [user["emails"][0]])
+      }
+
+      jwt.sign({userID: currentUser[0].id}, process.env.TOKENSECRET, { expiresIn: 1209600 }, (err, token) => {
+        let twoWeeks = new Date()
+        twoWeeks.setDate(twoWeeks.getDate() + 14)
+        res.cookie("accessToken", token, {expires: twoWeeks, httpOnly: true, sameSite: "none", secure: true })
+        res.json({
+          userID: currentUser[0].id
+        })
+      })
+    })
+})
+
+router.get('/login/google/callback',
+  passport.authenticate(("google")), (req, res) => {
+    console.log("REQ:")
+    console.log(req)
+    console.log("RES:")
+    console.log(res)
+
+    /*
+    db.task('login-google', async t => {
+      let user = `
+        SELECT * FROM USERS 
+      `
+    })
+
+    jwt.sign({userID: user[0].id}, process.env.TOKENSECRET, {
+      expiresIn: 1209600 // 2 Weeks
+    })
+
+    res.cookie("accessToken", "", {expires: new Date(2000), httpOnly: true, sameSite: "none", secure: true })
+    */
+
+    res.redirect("/")
+  })
 
 
 var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
