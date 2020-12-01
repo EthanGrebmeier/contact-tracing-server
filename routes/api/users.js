@@ -433,7 +433,7 @@ let emailWarning = async (session, sessionType) => {
 
 
         const mailOptions = {
-            from: process.env.GMAIL_USER,
+            from: `Traace <${process.env.GMAIL_USER}>`,
             to: user[0]["email"],
             subject: subject,
             html: html
