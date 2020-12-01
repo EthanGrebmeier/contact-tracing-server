@@ -166,8 +166,7 @@ router.post('/logout', passport.authenticate('local'), (req, res) => {
 })
 
 router.get('/login/google', passport.authenticate("google", {
-  scope: ["profile", "email"], successRedirect: "http://localhost:3000"
-}), (req, res) => {
+  scope: ["profile", "email"]}), (req, res) => {
 
     let {user} = req
 
@@ -211,9 +210,7 @@ router.get('/login/google', passport.authenticate("google", {
         let twoWeeks = new Date()
         twoWeeks.setDate(twoWeeks.getDate() + 14)
         res.cookie("accessToken", token, {expires: twoWeeks, httpOnly: true, sameSite: "none", secure: true })
-        res.json({
-          userID: currentUser[0].id
-        })
+        res.redirect(`http://localhost:3000/${currentUser[0].id}`)
       })
     })
 })
