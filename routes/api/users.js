@@ -360,10 +360,10 @@ let emailWarning = async (session, sessionType) => {
                 <div style="position: relative; font-family: 'Montserrat'; text-align: center;">
                     <table style="margin: 0; width:80%;background-color: #F0CF65; border: 4px solid black; border-radius: 12px; padding: 40px;">
                         <tr>
-                        <th style="font-size: 48px">Traace</th>
+                        <th style="font-size: 48px; color: black;">Traace</th>
                         </tr>
                         <tr style="width: 20%;">
-                        <td>Traace has been notified that ${session["name"]}, who you saw on ${dateString}, has tested positive for Covid-19. 
+                        <td style="color:black;">Traace has been notified that ${session["name"]}, who you saw on ${dateString}, has tested positive for Covid-19. 
                         We recommend that you self quarantine, and get tested as soon as possible</td>
                         </tr>
                     </table>
@@ -381,12 +381,12 @@ let emailWarning = async (session, sessionType) => {
                 </style>
 
                 <div style="position: relative; font-family: 'Montserrat'; text-align: center;">
-                    <table style="margin: 0; width:80%;background-color: #F0CF65; border: 4px solid black; border-radius: 12px; padding: 40px;">
+                    <table style="margin: 0; width:80%; background-color: #F0CF65; border: 4px solid black; border-radius: 12px; padding: 40px;">
                         <tr>
-                        <th style="font-size: 48px">Traace</th>
+                        <th style="font-size: 48px; color:black;">Traace</th>
                         </tr>
                         <tr style="width: 20%;">
-                        <td>Traace has been notified that somebody visiting ${session["name"]} at the same time as you on ${dateString}, has tested positive for Covid-19. 
+                        <td style="color:black;">Traace has been notified that somebody visiting ${session["name"]} at the same time as you on ${dateString}, has tested positive for Covid-19. 
                         We recommend that you self quarantine, and get tested as soon as possible</td>
                         </tr>
                     </table>
