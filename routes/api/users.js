@@ -346,44 +346,56 @@ let emailWarning = async (session, sessionType) => {
 
         let subject = "Potential Covid-19 Exposure"
 
-        let html;
         if (sessionType === "peopleSession"){
-            html = ejs.renderFile(__dirname + '/peopleSession.ejs', {name: session["name"], dateString: dateString}, (err, data) => {
+            ejs.renderFile(__dirname + '/peopleSession.ejs', {name: session["name"], dateString: dateString}, (err, data) => {
                 if (err) {
                     console.log(err)
                 } else {
                     console.log("PEOPLE HTML: ")
                     console.log(data)
-                    return data
+                    const mailOptions = {
+                        from: process.env.GMAIL_USER,
+                        to: user[0]["email"],
+                        subject: subject,
+                        html: data
+                    }
+            
+                    transporter.sendMail(mailOptions, (error, info) => {
+                        if (error) {
+                            console.log(error)
+                        } else {
+                            console.log('Email sent: ' + info.response)
+                        }
+                    })
                 }
             })
         } else {
-            html = ejs.renderFile(__dirname + '/placesSession.ejs', {name: session["name"], dateString: dateString}, (err, data) => {
+            ejs.renderFile(__dirname + '/placesSession.ejs', {name: session["name"], dateString: dateString}, (err, data) => {
                 if (err) {
                     console.log(err)
                 } else {
                     console.log("PLACE HTML: ")
                     console.log(data)
-                    return data
+                    const mailOptions = {
+                        from: process.env.GMAIL_USER,
+                        to: user[0]["email"],
+                        subject: subject,
+                        html: data
+                    }
+            
+                    transporter.sendMail(mailOptions, (error, info) => {
+                        if (error) {
+                            console.log(error)
+                        } else {
+                            console.log('Email sent: ' + info.response)
+                        }
+                    })
                 }
             })
         }
 
 
-        const mailOptions = {
-            from: process.env.GMAIL_USER,
-            to: user[0]["email"],
-            subject: subject,
-            html: html
-        }
-
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.log(error)
-            } else {
-                console.log('Email sent: ' + info.response)
-            }
-        })
+        
     }
 }
 
