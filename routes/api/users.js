@@ -285,6 +285,7 @@ router.post('/status', [authJWT.verifyToken],  (req, res) => {
 let notifyContacts = async (peopleSeen, status) => {
     console.log("PEOPLE")
     console.log(peopleSeen)
+
     for(people in peopleSeen){
         let sessionID = peopleSeen[people].id
         let notifiedPerson = await db.any(`INSERT INTO people_sessions_warnings (session_id, type, timestamp) values ($1, $2, clock_timestamp()) `, [sessionID, status])
@@ -310,9 +311,30 @@ let notifyVisitors = async (places) => {
                 ls.OR time_end between $2 and $3
             )
         `, [locationID, timeStart, timeEnd])
+
+        let currentWarnings = await db.any(`
+            SELECT id 
+            FROM locations_sessions 
+            WHERE location_id = $1
+            AND (
+                ls.time_start between $2 and $3
+                ls.OR time_end between $2 and $3
+            )
+        `)
+        
+        let currentWarningsSessionsIDList = []
+
+        for (warning in currentWarnings){
+            currentWarningsSessionsIDList.append(currentWarnings[warning]["id"])
+        }
+
         for (session in notifiedVisitors){
             console.log(session)
-            notifyOneVisitor(notifiedVisitors[session])
+            if (!currentWarningsSessionsIDList.includes(notifiedVisitors[session]["id"])){
+                notifyOneVisitor(notifiedVisitors[session])
+            } else {
+                console.log("Session already warned")
+            }
         }
     }
 }
