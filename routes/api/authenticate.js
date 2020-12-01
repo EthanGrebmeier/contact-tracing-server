@@ -166,7 +166,7 @@ router.post('/logout', passport.authenticate('local'), (req, res) => {
 })
 
 router.get('/login/google', passport.authenticate("google", {
-  scope: ["profile", "email"]
+  scope: ["profile", "email"], successRedirect: "localhost:5000"
 }), (req, res) => {
 
     let {user} = req
