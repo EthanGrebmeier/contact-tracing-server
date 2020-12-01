@@ -358,7 +358,7 @@ let emailWarning = async (session, sessionType) => {
                 </style>
 
                 <div style="height: 800px; position: relative; background-color: #93B5C6; font-family: 'Montserrat'; text-align: center;">
-                    <table style="margin: 0; width:80%; position: absolute; top: 50%; left: 50%; margin-top: -100px; margin-left: -300px; background-color: #F0CF65; border: 4px solid black; border-radius: 12px; height: 200px; width: 600px; padding: 40px;">
+                    <table style="margin:0; width:80%; position: absolute; top: 50%; left: 50%; margin-top: -100px; margin-left: -300px; background-color: #F0CF65; border: 4px solid black; border-radius: 12px; height: 200px; width: 600px; padding: 40px;">
                         <tr>
                         <th style="font-size: 48px">Traace</th>
                         </tr>
@@ -381,7 +381,7 @@ let emailWarning = async (session, sessionType) => {
                 </style>
 
                 <div style="height: 800px; position: relative; background-color: #93B5C6; font-family: 'Montserrat'; text-align: center;">
-                    <table style="margin: 0; width:80%; position: absolute; top: 50%; left: 50%; margin-top: -100px; margin-left: -300px; background-color: #F0CF65; border: 4px solid black; border-radius: 12px; height: 200px; width: 600px; padding: 40px;">
+                    <table style="margin:0; width:80%; position: absolute; top: 50%; left: 50%; margin-top: -100px; margin-left: -300px; background-color: #F0CF65; border: 4px solid black; border-radius: 12px; height: 200px; width: 600px; padding: 40px;">
                         <tr>
                         <th style="font-size: 48px">Traace</th>
                         </tr>
