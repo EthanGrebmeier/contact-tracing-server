@@ -286,10 +286,16 @@ let notifyContacts = async (peopleSeen, status) => {
     console.log("PEOPLE")
     console.log(peopleSeen)
 
+    let peopleList = []
+
     for(people in peopleSeen){
-        let sessionID = peopleSeen[people].id
-        let notifiedPerson = await db.any(`INSERT INTO people_sessions_warnings (session_id, type, timestamp) values ($1, $2, clock_timestamp()) `, [sessionID, status])
-        emailWarning(peopleSeen[people], "peopleSession")
+        if (!peopleList.includes(peopleSeen[people]["name"])){
+            let sessionID = peopleSeen[people]["id"]
+            let notifiedPerson = await db.any(`INSERT INTO people_sessions_warnings (session_id, type, timestamp) values ($1, $2, clock_timestamp()) `, [sessionID, status])
+            emailWarning(peopleSeen[people], "peopleSession")
+            peopleList.push(peopleSeen[people]["name"])
+        }
+
     }
 }
 
