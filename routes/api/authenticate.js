@@ -154,14 +154,14 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
   let {user} = req
   let twoWeeks = new Date()
   twoWeeks.setDate(twoWeeks.getDate() + 14)
-  res.cookie("accessToken", user["accessToken"], {expires: twoWeeks, httpOnly: true, sameSite: "none", secure: true })
+  res.cookie("accessToken", user["accessToken"], {expires: twoWeeks, httpOnly: true})
   res.json({
     userID: user["id"],
   })
 })
 
 router.post('/logout', [authJWT.verifyToken], (req, res) => {
-  res.cookie("accessToken", "", {expires: new Date(2000), httpOnly: true, sameSite: "none", secure: true })
+  res.cookie("accessToken", "", {expires: new Date(2000), httpOnly: true})
   res.send()
 })
 
