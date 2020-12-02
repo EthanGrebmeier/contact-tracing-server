@@ -24,6 +24,23 @@ router.get('/:userID',[authJWT.verifyToken], (req, res) => {
     })
 })
 
+//Get a user's friend code
+router.get('/connections/code/:userID', [authJWT.verifyToken], (req, res) => {
+    db
+        .any(`
+        Select code
+        from users where id = $1
+        `, [req.params.userID])
+        .then(resSql => {
+            res.json({
+                "code": resSql[0]["code"]
+            })
+        })
+        .catch(err => {
+            console.log(err)
+        })
+})
+
 //Get all of a User's Connections by ID
 router.get('/connections/:userID', [authJWT.verifyToken], (req, res) => {
     db
