@@ -134,7 +134,7 @@ router.post('/register', (req, res) => {
                       console.log(newUser)
                       let twoWeeks = new Date()
                       twoWeeks.setDate(twoWeeks.getDate() + 14)
-                      res.cookie("accessToken", user["accessToken"], {expires: twoWeeks, httpOnly: true, sameSite: "none", secure: true })
+                      res.cookie("accessToken", token, {expires: twoWeeks, httpOnly: true, sameSite: "none", secure: true })
                       res.json({
                         userID: newUser[0]["id"].toString()
                       })
