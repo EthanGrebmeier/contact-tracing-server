@@ -8,7 +8,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy
 const bcrypt = require('bcryptjs')
 
 const db = require('../../pgp');
-
+const authJWT = require('../../authJWT')
 
 passport.use(new LocalStrategy((username, password, cb) => {
   let email = username.toLowerCase()
@@ -160,7 +160,7 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
   })
 })
 
-router.post('/logout', passport.authenticate('local'), (req, res) => {
+router.post('/logout', [authJWT.verifyToken], (req, res) => {
   res.cookie("accessToken", "", {expires: new Date(2000), httpOnly: true, sameSite: "none", secure: true })
   res.send()
 })
