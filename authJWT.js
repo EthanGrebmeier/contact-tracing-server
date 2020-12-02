@@ -12,7 +12,7 @@ verifyToken = async (req, res, next) => {
 
   console.log("ID")
   console.log(id)
-  
+
   if (!token) {
     return res.status(403).send({
       message: "No token provided!"
@@ -20,6 +20,13 @@ verifyToken = async (req, res, next) => {
   }
 
   jwt.verify(token, process.env.TOKENSECRET, (err, decoded) => {
+
+    console.log("DECODED ID")
+    console.log(decoded["userID"])
+
+    console.log("EXPECTED ID")
+    console.log(id)
+
     if (err || decoded["userID"] != id) {
       if (err){
         console.log(err)
