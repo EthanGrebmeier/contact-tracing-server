@@ -204,6 +204,8 @@ router.get('/login/google', passport.authenticate("google", {
           SELECT * FROM USERS 
           WHERE email = $1
         `, [user["emails"][0]])
+
+        console.log(currentUser[0])
       }
 
       jwt.sign({userID: currentUser[0].id}, process.env.TOKENSECRET, { expiresIn: 1209600 }, (err, token) => {
