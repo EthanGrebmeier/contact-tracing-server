@@ -124,14 +124,17 @@ router.post('/locations/', [authJWT.verifyToken], (req, res) => {
     console.log(req.body.date)
 
     if (timeIn > timeOut){
+        console.log("Improper time format")
         res.status(400).json({
             "status": "Improper time format"
         })
     } else if( checkTwoWeeks(timeIn) ) {
+        console.log("Date must be in the past two weeks")
         res.status(400).json({
             "status": "Date must be in the past two weeks"
         })
     } else if( new Date() < timeIn ) {
+        console.log("Date must be not be in the future")
         res.status(400).json({
             "status": "Date must be not be in the future"
         })
