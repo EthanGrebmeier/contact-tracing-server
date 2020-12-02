@@ -127,7 +127,7 @@ router.post('/register', (req, res) => {
               SELECT id FROM users WHERE code = $1
             `, [friendCode])
 
-            jwt.sign({userID: user[0].id}, process.env.TOKENSECRET, { expiresIn: 1209600}, (err, token) => {
+            jwt.sign({userID: newUser[0].id}, process.env.TOKENSECRET, { expiresIn: 1209600}, (err, token) => {
                     if (err){ 
                       console.log(err)
                     } else {
