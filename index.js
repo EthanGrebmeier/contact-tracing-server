@@ -17,7 +17,7 @@ const port = process.env.PORT || 5000
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: false })); 
 
-let whitelist = ['http://localhost:3000', 'http://traace.io']
+let whitelist = ['http://localhost:3000', 'http://traace.io', 'http://www.traace.io']
 
 app.use(cors({
   origin: function(origin, callback){
