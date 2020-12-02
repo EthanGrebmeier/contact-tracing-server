@@ -16,10 +16,22 @@ const port = process.env.PORT || 5000
 // Parse incoming requests data 
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: false })); 
+
+let whitelist = ['http://localhost:3000', 'http://traace.io']
+
 app.use(cors({
-    origin: "http://localhost:3000",
-    credentials: true
-}))
+  origin: function(origin, callback){
+    // allow requests with no origin 
+    if(!origin) return callback(null, true);
+    if(whitelist.indexOf(origin) === -1){
+      var message = 'The CORS policy for this origin doesn't ' +
+                'allow access from the particular origin.';
+      return callback(new Error(message), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true
+}));
 
 app.use(cookieParser())
 
