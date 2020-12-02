@@ -212,7 +212,7 @@ router.get('/login/google', passport.authenticate("google", {
         let twoWeeks = new Date()
         twoWeeks.setDate(twoWeeks.getDate() + 14)
         res.cookie("accessToken", token, {expires: twoWeeks, httpOnly: true, sameSite: "none", secure: true })
-        res.redirect(`http://www.traace.io/${currentUser[0].id}`)
+        res.redirect(`https://www.traace.io/${currentUser[0].id}`)
       })
     })
 })
