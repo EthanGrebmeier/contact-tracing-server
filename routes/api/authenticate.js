@@ -160,7 +160,7 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
   })
 })
 
-router.post('/logout', [authJWT.verifyToken], (req, res) => {
+router.post('/logout', (req, res) => {
   res.cookie("accessToken", "", {expires: new Date(2000), httpOnly: true})
   res.send()
 })
