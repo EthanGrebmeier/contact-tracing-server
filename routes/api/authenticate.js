@@ -156,14 +156,14 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
   twoWeeks.setDate(twoWeeks.getDate() + 14)
   console.log("LOGIN ROUTE TOKEN : ")
   console.log(user["accessToken"])
-  res.cookie("accessToken", user["accessToken"], {expires: twoWeeks, httpOnly: true, secure: true })
+  res.cookie("accessToken", user["accessToken"], {expires: twoWeeks, httpOnly: true,sameSite: "strict" ,secure: true })
   res.json({
     userID: user["id"],
   })
 })
 
 router.post('/logout', (req, res) => {
-  res.cookie("accessToken", "", {expires: new Date(2000), httpOnly: true, secure: true })
+  res.cookie("accessToken", "", {expires: new Date(2000), httpOnly: true, sameSite: "strict", secure: true })
   res.send()
 })
 router.get('/login/google', passport.authenticate("google", {
@@ -212,7 +212,7 @@ router.get('/login/google', passport.authenticate("google", {
       jwt.sign({userID: currentUser[0].id}, process.env.TOKENSECRET, { expiresIn: 1209600 }, (err, token) => {
         let twoWeeks = new Date()
         twoWeeks.setDate(twoWeeks.getDate() + 14)
-        res.cookie("accessToken", token, {expires: twoWeeks, httpOnly: true, secure: true })
+        res.cookie("accessToken", token, {expires: twoWeeks, httpOnly: true, sameSite: "strict", secure: true })
         res.redirect(`https://www.traace.io/${currentUser[0].id}`)
       })
     })
