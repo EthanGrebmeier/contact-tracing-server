@@ -2,13 +2,13 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-
+var enforce = require('express-sslify');
 const path = __dirname + '/views/';
 
 const app = express(); 
 
 app.use(express.static(path));
-
+app.use(enforce.HTTPS({trustProtoHeader: true}));
 const port = process.env.PORT || 5000
 
 // Parse incoming requests data 
