@@ -77,7 +77,9 @@ router.post('/connections', [authJWT.verifyToken], (req, res) => {
             console.log(`Request sent to ${targetUser[0]["name"]} from ID: ${req.body.userID}`)
 
 
-            if (targetUser.length != 0){
+            if (targetUser[0]["id"] == req.body.userID){
+                res.send("Cannot send a request to yourself")
+            } else if (targetUser.length != 0){
 
                 let existingFriend = await db.any(`
                     SELECT * FROM friends WHERE user1 = $2 and user2 = $1
