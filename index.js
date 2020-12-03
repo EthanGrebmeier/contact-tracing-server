@@ -1,21 +1,21 @@
 const express = require('express'); 
-
-
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+
+const path = __dirname + '/views/';
+
 const app = express(); 
 
+app.use(express.static(path));
 
 const port = process.env.PORT || 5000
-
-
 
 // Parse incoming requests data 
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: false })); 
 
-let whitelist = ['http://localhost:3000', 'https://traace.io', 'https://www.traace.io']
+let whitelist = ['http://localhost:5000', 'https://traace.io', 'https://www.traace.io']
 
 app.use(cors({
   origin: function(origin, callback){
@@ -31,6 +31,10 @@ app.use(cors({
 }));
 
 app.use(cookieParser())
+
+app.get('/', function (req,res) {
+  res.sendFile(path + "index.html");
+});
 
 app.use('/api/authenticate', require('./routes/api/authenticate'))
 

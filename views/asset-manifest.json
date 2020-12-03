@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "/static/css/main.d5f413d6.chunk.css",
+    "main.js": "/static/js/main.f9531ebf.chunk.js",
+    "runtime-main.js": "/static/js/runtime-main.520c08df.js",
+    "static/js/2.46dd9e24.chunk.js": "/static/js/2.46dd9e24.chunk.js",
+    "index.html": "/index.html",
+    "precache-manifest.616888a06051a81cd35b03a968db6242.js": "/precache-manifest.616888a06051a81cd35b03a968db6242.js",
+    "service-worker.js": "/service-worker.js",
+    "static/js/2.46dd9e24.chunk.js.LICENSE.txt": "/static/js/2.46dd9e24.chunk.js.LICENSE.txt",
+    "static/media/Traace.scss": "/static/media/Montserrat-Regular.92db9a07.otf"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.520c08df.js",
+    "static/js/2.46dd9e24.chunk.js",
+    "static/css/main.d5f413d6.chunk.css",
+    "static/js/main.f9531ebf.chunk.js"
+  ]
+}
