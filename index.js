@@ -3,7 +3,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 var enforce = require('express-sslify');
-import sslRedirect from 'heroku-ssl-redirect';
+var sslRedirect = require('heroku-ssl-redirect');
 const path = __dirname + '/views/';
 
 const app = express(); 
