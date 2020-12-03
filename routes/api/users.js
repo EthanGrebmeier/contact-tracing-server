@@ -2,7 +2,6 @@ const express = require('express')
 const cookieParser = require('cookie-parser');
 const router = express.Router();
 const nodemailer = require('nodemailer')
-const smtpTransport = require('nodemailer-smtp-transport');
 const db = require('../../pgp');
 
 const authJWT = require('../../authJWT')
