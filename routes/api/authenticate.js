@@ -154,6 +154,8 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
   let {user} = req
   let twoWeeks = new Date()
   twoWeeks.setDate(twoWeeks.getDate() + 14)
+  console.log("LOGIN ROUTE TOKEN : ")
+  console.log(user["accessToken"])
   res.cookie("accessToken", user["accessToken"], {expires: twoWeeks, httpOnly: true, sameSite: "none", secure: true })
   res.json({
     userID: user["id"],
