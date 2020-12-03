@@ -67,9 +67,15 @@ router.post('/connections', [authJWT.verifyToken], (req, res) => {
     db
         .task('send-request', async t => {
 
+            console.log("FRIEND REQUEST BODY")
+            console.log(req.body)
+
             let targetUser = await db.any(`
                 SELECT * from users where code = $1
             `, [req.body.friendCode])
+
+            console.log(`Request sent to ${targetUser[0]["name"]} from ID: ${req.body.userID}`)
+
 
             if (targetUser.length != 0){
 
@@ -78,7 +84,7 @@ router.post('/connections', [authJWT.verifyToken], (req, res) => {
                 `, [req.body.userID, targetUser[0]["id"]]) 
 
 
-                console.log("existingFriend")
+                console.log("existingFriendCheck")
                 console.log(existingFriend)
     
                 if (existingFriend.length == 0){
