@@ -164,7 +164,7 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
 
 router.post('/logout', (req, res) => {
   res.cookie("accessToken", "", {expires: new Date(2000), httpOnly: true})
-  res.send()
+  res.redirect("/")
 })
 router.get('/login/google', passport.authenticate("google", {
   scope: ["profile", "email"]}), (req, res) => {
