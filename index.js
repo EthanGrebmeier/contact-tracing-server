@@ -3,12 +3,14 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 var enforce = require('express-sslify');
+import sslRedirect from 'heroku-ssl-redirect';
 const path = __dirname + '/views/';
 
 const app = express(); 
 
 app.use(express.static(path));
 app.use(enforce.HTTPS({trustProtoHeader: true}));
+app.use(sslRedirect());
 const port = process.env.PORT || 5000
 
 // Parse incoming requests data 
