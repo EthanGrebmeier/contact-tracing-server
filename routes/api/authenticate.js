@@ -204,25 +204,16 @@ router.get('/login/google', passport.authenticate("google", {
         currentUser = await db.any(`
           SELECT * FROM USERS 
           WHERE email = $1
-        `, [user["emails"][0]])
+        `, [user["emails"][0]["value"]])
 
-        jwt.sign({userID: currentUser[0].id}, process.env.TOKENSECRET, { expiresIn: 1209600 }, (err, token) => {
-          let twoWeeks = new Date()
-          twoWeeks.setDate(twoWeeks.getDate() + 14)
-          res.cookie("accessToken", token, {expires: twoWeeks, httpOnly: true, sameSite: "none", secure: true })
-          res.redirect(`/#/${currentUser[0].id}`)
-        })
-        
-      } else {
-        jwt.sign({userID: currentUser[0].id}, process.env.TOKENSECRET, { expiresIn: 1209600 }, (err, token) => {
-          let twoWeeks = new Date()
-          twoWeeks.setDate(twoWeeks.getDate() + 14)
-          res.cookie("accessToken", token, {expires: twoWeeks, httpOnly: true, sameSite: "none", secure: true })
-          res.redirect(`/#/${currentUser[0].id}`)
-        })
       }
 
-      
+      jwt.sign({userID: currentUser[0].id}, process.env.TOKENSECRET, { expiresIn: 1209600 }, (err, token) => {
+        let twoWeeks = new Date()
+        twoWeeks.setDate(twoWeeks.getDate() + 14)
+        res.cookie("accessToken", token, {expires: twoWeeks, httpOnly: true, sameSite: "none", secure: true })
+        res.redirect(`/#/${currentUser[0].id}`)
+      })
     })
 })
 
